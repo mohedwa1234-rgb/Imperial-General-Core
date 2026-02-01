@@ -32,6 +32,23 @@ def general_core():
             
             /* زر تبديل اللغات السيادي - ثابت ومحدث */
             #langBtn { position: fixed; top: 15px; left: 15px; z-index: 10000; border: 2px solid var(--glow); background: rgba(0,40,0,0.8); color: var(--glow); padding: 8px 15px; cursor: pointer; font-weight: bold; box-shadow: 0 0 10px var(--glow); }
+<style>
+    #langBtn { 
+        position: fixed; 
+        top: 10px; 
+        left: 10px; 
+        z-index: 99999; /* أعلى طبقة ممكنة */
+        background: #00ff00; 
+        color: #000; 
+        padding: 10px 15px; 
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+    }
+</style>
+
+<button id="langBtn" onclick="toggleLang()">ENGLISH / العربية</button>
+
             #langBtn:hover { background: var(--glow); color: #000; }
 
             .viewport { display: grid; grid-template-columns: 280px 1fr 280px; height: 100vh; padding: 10px; gap: 10px; }
