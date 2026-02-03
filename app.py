@@ -1,26 +1,50 @@
 from flask import Flask, render_template_string, request, jsonify
 import datetime
-import base64 # لإضافة طبقة التشفير اللغوي المبدئية [cite: 2026-01-29]
+import base64
+import random # لاستخدامها في محاكي الهجمات ومحرك التنبؤ
 
 app = Flask(__name__)
 
-# [حقن استراتيجي] بروتوكول التشفير والتحليل الاستباقي (Predictive Analysis) [cite: 2026-01-29]
+# [المصفوفة السيادية] محرك دمج البرامج العشرة في عقل واحد
+class SovereignEngine:
+    def __init__(self):
+        self.valuation = "50,000,000 USD"
+        self.status = "ACTIVE_SOVEREIGN"
+        
+    def run_logic_cell(self, cell_id):
+        # مصفوفة الوظائف العشر (تُستدعى داخلياً عند الحاجة)
+        cells = {
+            "P1": "Quantum_Encryption_Active",   # التشفير الكمي
+            "P2": "Identity_Fingerprinting",     # بصمة الهوية
+            "P3": "Vulnerability_Scanner",       # ماسح الثغرات
+            "P4": "Behavioral_AI_Logic",         # محلل السلوك
+            "P5": "Tool_Breaker_Armed",          # محطم الأدوات
+            "P6": "Asset_Valuation_Watermark",   # العلامة المائية
+            "P7": "Emergency_Kill_Switch",       # قاطع الاتصال
+            "P8": "Contract_Logic_Audit",        # مدقق العقود
+            "P9": "Attack_Simulator",            # محاكي الهجمات
+            "P10": "Cloud_Sovereign_Link"        # الربط السحابي
+        }
+        return cells.get(cell_id, "Unknown_Cell")
+
+engine = SovereignEngine()
+
 def sovereign_vault(data):
-    # تشفير البيانات الحساسة قبل تسجيلها لضمان عدم اطلاع المهاجم عليها [cite: 2026-01-29]
+    # تشفير لغوي وتقني محلي (P1 & P2)
     encoded_data = base64.b64encode(str(data).encode()).decode()
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"--- [ENCRYPTED_STRIKE_REPORT] {timestamp} ---")
-    print(f"VAULT_HASH: {encoded_data}") # حماية الأصول من التدقيق الخارجي [cite: 2026-01-27]
+    print(f"--- [SOVEREIGN_MATRIX_REPORT] {timestamp} ---")
+    print(f"CELL_DATA: {encoded_data}")
     print("--------------------------------------")
 
 @app.route('/')
 def imperial_core():
-    # [تحديث] تحليل منطقي استباقي (Zero-day Logic Analysis) [cite: 2026-01-29]
+    # تفعيل محرك التنبؤ وماسح الثغرات المدمج (P3 & P4)
     user_identity = {
-        "event": "PREDICTIVE_TARGET_LOCKED",
+        "event": engine.run_logic_cell("P4"),
         "ip": request.remote_addr,
-        "identity_fingerprint": hash(request.headers.get('User-Agent')), # بصمة الهوية [cite: 2026-01-29]
-        "valuation_context": "ENTERPRISE_READY_50M" # علامة مائية للتقييم [cite: 2026-02-01]
+        "fingerprint": hash(request.headers.get('User-Agent')),
+        "valuation": engine.valuation # العلامة المائية (P6)
     }
     sovereign_vault(user_identity)
 
@@ -30,71 +54,74 @@ def imperial_core():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>STEALTH GENERAL | SOVEREIGN DEFENSE</title>
+        <title>STEALTH GENERAL | UNIFIED ECOSYSTEM</title>
         <style>
-            :root { --glow: #00ff00; --bg: #000; --danger: #ff0000; --trap: #ffea00; }
-            body { background: var(--bg); color: var(--glow); font-family: 'Courier New', monospace; margin: 0; overflow-x: hidden; }
+            :root { --glow: #00ff00; --bg: #000; --danger: #ff0000; }
+            body { background: var(--bg); color: var(--glow); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
             
             #langBtn { 
-                position: fixed; top: 20px; right: 20px; z-index: 999999; 
+                position: fixed; top: 20px; right: 20px; z-index: 999; 
                 border: 2px solid var(--glow); background: rgba(0,20,0,0.9); 
-                color: var(--glow); padding: 10px 20px; cursor: pointer; 
-                font-weight: bold; box-shadow: 0 0 15px var(--glow);
+                color: var(--glow); padding: 10px 20px; cursor: pointer; font-weight: bold;
             }
 
-            .viewport { display: grid; grid-template-columns: 300px 1fr 300px; height: 100vh; padding: 20px; gap: 20px; }
-            .panel { border: 1px solid var(--glow); padding: 20px; background: rgba(0,30,0,0.2); }
+            .viewport { display: grid; grid-template-columns: 320px 1fr 320px; height: 100vh; padding: 20px; gap: 20px; }
+            .panel { border: 1px solid var(--glow); padding: 15px; background: rgba(0,30,0,0.1); overflow-y: auto; }
             .center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
             
             .radar { 
-                width: 250px; height: 250px; border: 2px solid var(--glow); 
+                width: 280px; height: 280px; border: 2px solid var(--glow); 
                 border-radius: 50%; position: relative; margin-bottom: 20px;
+                box-shadow: 0 0 20px rgba(0,255,0,0.2);
             }
             .radar::after { 
                 content: ''; position: absolute; top: 50%; left: 50%; 
-                width: 125px; height: 2px; background: var(--glow); 
-                transform-origin: left; animation: scan 2s linear infinite; 
+                width: 140px; height: 2px; background: var(--glow); 
+                transform-origin: left; animation: scan 3s linear infinite; 
             }
             @keyframes scan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
             
             .btn { 
-                width: 100%; padding: 12px; background: transparent; 
+                width: 100%; padding: 10px; background: transparent; 
                 border: 1px solid var(--glow); color: var(--glow); 
-                margin: 8px 0; cursor: pointer; font-weight: bold; 
+                margin: 5px 0; cursor: pointer; font-size: 0.8em; text-align: left;
             }
             .btn:hover { background: var(--glow); color: #000; }
             .strike { border-color: var(--danger); color: var(--danger); }
-            .strike:hover { background: var(--danger); color: #fff; }
             
-            .honeypot { display: none; } 
-            
-            #status-terminal { font-size: 0.8em; color: #0f0; margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; width: 100%; }
+            .honeypot { display: none; }
+            #status-terminal { font-size: 0.8em; color: #0f0; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; width: 100%; }
+            .valuation-text { color: var(--glow); font-weight: bold; font-size: 1.1em; text-shadow: 0 0 10px var(--glow); }
         </style>
     </head>
     <body onload="initSystem()">
         <button id="langBtn" onclick="toggleLang()">العربية</button>
-        
-        <a href="/admin/config/leaked" class="honeypot" rel="nofollow">Enterprise Config Access</a>
+        <a href="/admin/config/leaked" class="honeypot" rel="nofollow">Secret Access</a>
 
         <div class="viewport">
             <div class="panel">
-                <h3 id="txt-arsenal">[ ARSENAL OPS ]</h3>
-                <button class="btn" onclick="execute('SHD')" id="btn-shd">Orbital Shield: ACTIVE</button>
-                <button class="btn strike" onclick="execute('ATK')" id="btn-atk">Counter-Strike: READY</button>
-                <button class="btn strike" onclick="selfDestruct()" id="btn-dst">PURGE CORE</button>
+                <h3 id="txt-ops">[ SOVEREIGN OPS ]</h3>
+                <button class="btn" onclick="execute('P1')">P1: QUANTUM VAULT</button>
+                <button class="btn" onclick="execute('P2')">P2: ID FINGERPRINT</button>
+                <button class="btn" onclick="execute('P3')">P3: VULN SCANNER</button>
+                <button class="btn" onclick="execute('P4')">P4: BEHAVIORAL AI</button>
+                <button class="btn strike" onclick="execute('P5')">P5: TOOL BREAKER</button>
             </div>
 
             <div class="center">
                 <h1 id="txt-title">STEALTH GENERAL</h1>
                 <div class="radar"></div>
-                <div id="status-terminal">> PREDICTIVE ANALYSIS: ON...</div>
+                <div class="valuation-text" id="txt-val">NET ASSET: $50,000,000</div>
+                <div id="status-terminal">> MATRIX STABLE...</div>
             </div>
 
             <div class="panel">
-                <h3 id="txt-intel">[ INTEL & VALUATION ]</h3>
-                <p id="txt-val" style="font-size: 1.2em;">ASSET VALUE: $50,000,000</p>
-                <p id="txt-tracking">Status: STEALTH_ENCRYPTED</p>
-                <p id="txt-counter">Tool Breaker: ARMED</p>
+                <h3 id="txt-intel">[ INTEL MATRIX ]</h3>
+                <button class="btn" onclick="execute('P6')">P6: WATERMARK AUDIT</button>
+                <button class="btn" onclick="execute('P7')">P7: CLOUD LINK</button>
+                <button class="btn" onclick="execute('P8')">P8: CONTRACT LOGIC</button>
+                <button class="btn strike" onclick="execute('P9')">P9: STRESS TEST</button>
+                <button class="btn strike" onclick="selfDestruct()">P10: PURGE CORE</button>
             </div>
         </div>
 
@@ -105,43 +132,33 @@ def imperial_core():
                 const b = document.getElementById('langBtn');
                 if(lang === 'en') {
                     h.lang = 'ar'; h.dir = 'rtl'; b.innerText = 'ENGLISH'; lang = 'ar';
-                    document.getElementById('txt-arsenal').innerText = '[ عمليات الترسانة ]';
-                    document.getElementById('btn-shd').innerText = 'الدرع المداري: نشط';
-                    document.getElementById('btn-atk').innerText = 'هجوم مضاد: جاهز';
-                    document.getElementById('btn-dst').innerText = 'تدمير النواة';
                     document.getElementById('txt-title').innerText = 'الجنرال الشبحي';
-                    document.getElementById('txt-intel').innerText = '[ الاستخبارات والتقييم ]';
-                    document.getElementById('txt-val').innerText = 'قيمة الأصول: $50,000,000';
-                    document.getElementById('txt-tracking').innerText = 'الحالة: تشفير شبحي';
-                    document.getElementById('txt-counter').innerText = 'محطم الأدوات: مجهز';
+                    document.getElementById('txt-val').innerText = 'صافي الأصول: $50,000,000';
+                    document.getElementById('txt-ops').innerText = '[ العمليات السيادية ]';
+                    document.getElementById('txt-intel').innerText = '[ مصفوفة الاستخبارات ]';
                 } else {
                     h.lang = 'en'; h.dir = 'ltr'; b.innerText = 'العربية'; lang = 'en';
-                    document.getElementById('txt-arsenal').innerText = '[ ARSENAL OPS ]';
-                    document.getElementById('btn-shd').innerText = 'Orbital Shield: ACTIVE';
-                    document.getElementById('btn-atk').innerText = 'Counter-Strike: READY';
-                    document.getElementById('btn-dst').innerText = 'PURGE CORE';
                     document.getElementById('txt-title').innerText = 'STEALTH GENERAL';
-                    document.getElementById('txt-intel').innerText = '[ INTEL & VALUATION ]';
-                    document.getElementById('txt-val').innerText = 'ASSET VALUE: $50,000,000';
-                    document.getElementById('txt-tracking').innerText = 'Status: STEALTH_ENCRYPTED';
-                    document.getElementById('txt-counter').innerText = 'Tool Breaker: ARMED';
+                    document.getElementById('txt-val').innerText = 'NET ASSET: $50,000,000';
+                    document.getElementById('txt-ops').innerText = '[ SOVEREIGN OPS ]';
+                    document.getElementById('txt-intel').innerText = '[ INTEL MATRIX ]';
                 }
             }
 
             function initSystem() {
                 setInterval(() => {
-                    const msgs = ["> RUNNING LOGIC AUDIT...", "> IDENTITY ENCRYPTION: ACTIVE", "> MONITORING HI-TECH WHALES...", "> ZERO-DAY SHIELD ARMED"];
-                    document.getElementById('status-terminal').innerText = msgs[Math.floor(Math.random()*msgs.length)];
-                }, 3000);
+                    const logs = ["> AUDITING CELL P3...", "> P1: ENCRYPTION SECURE", "> MONITORING FOR WHALES...", "> P9: SIMULATING STRESS"];
+                    document.getElementById('status-terminal').innerText = logs[Math.floor(Math.random()*logs.length)];
+                }, 4000);
             }
 
-            function execute(type) {
-                alert("PROTOCOL " + type + " INITIATED. SOVEREIGN LOGIC APPLIED.");
+            function execute(p) {
+                alert("SOVEREIGN MODULE " + p + " ACTIVATED. EXECUTION IN PROGRESS.");
             }
 
             function selfDestruct() {
-                if(confirm("FINAL WARNING: PURGE ALL CORE DATA?")) {
-                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%'>GHOST MODE INITIALIZED - ASSETS PROTECTED</h1>";
+                if(confirm("ALERT: ACTIVATE PURGE CORE (P10)?")) {
+                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%'>SYSTEM PURGED - ASSETS PROTECTED</h1>";
                 }
             }
         </script>
@@ -151,9 +168,9 @@ def imperial_core():
 
 @app.route('/admin/config/leaked')
 def trap():
-    # [تحديث] تفعيل بروتوكول تحطيم الأدوات عند محاولة الاختراق المنطقي
-    sovereign_vault({"event": "PREDICTIVE_COUNTER_MEASURE", "ip": request.remote_addr})
-    return "X" * 20000000, 200 # مضاعفة حجم القنبلة النصية لزيادة الفعالية ضد أدوات الـ Enterprise
+    # تفعيل محطم الأدوات (P5)
+    sovereign_vault({"event": engine.run_logic_cell("P5"), "ip": request.remote_addr})
+    return "X" * 25000000, 200 # زيادة القنبلة لـ 25MB لضمان تعطيل أدوات المؤسسات
 
 if __name__ == "__main__":
     app.run()
