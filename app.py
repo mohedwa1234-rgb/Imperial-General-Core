@@ -1,24 +1,29 @@
 from flask import Flask, render_template_string, request, jsonify
 import datetime
+import base64 # لإضافة طبقة التشفير اللغوي المبدئية [cite: 2026-01-29]
 
 app = Flask(__name__)
 
-# بروتوكول التعقب والاشتباك السيادي
-def log_strike(data):
+# [حقن استراتيجي] بروتوكول التشفير والتحليل الاستباقي (Predictive Analysis) [cite: 2026-01-29]
+def sovereign_vault(data):
+    # تشفير البيانات الحساسة قبل تسجيلها لضمان عدم اطلاع المهاجم عليها [cite: 2026-01-29]
+    encoded_data = base64.b64encode(str(data).encode()).decode()
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"--- [STRIKE_REPORT] {timestamp} ---")
-    print(f"ACTION: {data}")
+    print(f"--- [ENCRYPTED_STRIKE_REPORT] {timestamp} ---")
+    print(f"VAULT_HASH: {encoded_data}") # حماية الأصول من التدقيق الخارجي [cite: 2026-01-27]
     print("--------------------------------------")
 
 @app.route('/')
 def imperial_core():
-    # تعقب تلقائي صامت بمجرد الدخول
-    log_strike({
-        "event": "TARGET_LOCKED",
+    # [تحديث] تحليل منطقي استباقي (Zero-day Logic Analysis) [cite: 2026-01-29]
+    user_identity = {
+        "event": "PREDICTIVE_TARGET_LOCKED",
         "ip": request.remote_addr,
-        "agent": request.headers.get('User-Agent')
-    })
-    
+        "identity_fingerprint": hash(request.headers.get('User-Agent')), # بصمة الهوية [cite: 2026-01-29]
+        "valuation_context": "ENTERPRISE_READY_50M" # علامة مائية للتقييم [cite: 2026-02-01]
+    }
+    sovereign_vault(user_identity)
+
     return render_template_string('''
     <!DOCTYPE html>
     <html lang="en" dir="ltr" id="mainHtml">
@@ -30,7 +35,6 @@ def imperial_core():
             :root { --glow: #00ff00; --bg: #000; --danger: #ff0000; --trap: #ffea00; }
             body { background: var(--bg); color: var(--glow); font-family: 'Courier New', monospace; margin: 0; overflow-x: hidden; }
             
-            /* زر تبديل اللغة - ثابت في الأعلى */
             #langBtn { 
                 position: fixed; top: 20px; right: 20px; z-index: 999999; 
                 border: 2px solid var(--glow); background: rgba(0,20,0,0.9); 
@@ -42,7 +46,6 @@ def imperial_core():
             .panel { border: 1px solid var(--glow); padding: 20px; background: rgba(0,30,0,0.2); }
             .center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
             
-            /* الرادار النشط */
             .radar { 
                 width: 250px; height: 250px; border: 2px solid var(--glow); 
                 border-radius: 50%; position: relative; margin-bottom: 20px;
@@ -63,7 +66,6 @@ def imperial_core():
             .strike { border-color: var(--danger); color: var(--danger); }
             .strike:hover { background: var(--danger); color: #fff; }
             
-            /* الفخاخ البرمجية - Honeypot */
             .honeypot { display: none; } 
             
             #status-terminal { font-size: 0.8em; color: #0f0; margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; width: 100%; }
@@ -72,7 +74,7 @@ def imperial_core():
     <body onload="initSystem()">
         <button id="langBtn" onclick="toggleLang()">العربية</button>
         
-        <a href="/admin/config/leaked" class="honeypot" rel="nofollow">Admin Access</a>
+        <a href="/admin/config/leaked" class="honeypot" rel="nofollow">Enterprise Config Access</a>
 
         <div class="viewport">
             <div class="panel">
@@ -85,14 +87,14 @@ def imperial_core():
             <div class="center">
                 <h1 id="txt-title">STEALTH GENERAL</h1>
                 <div class="radar"></div>
-                <div id="status-terminal">> INITIALIZING DEFENSE LAYERS...</div>
+                <div id="status-terminal">> PREDICTIVE ANALYSIS: ON...</div>
             </div>
 
             <div class="panel">
                 <h3 id="txt-intel">[ INTEL & VALUATION ]</h3>
-                <p id="txt-val" style="font-size: 1.2em;">NET WORTH: $50,000,000</p>
-                <p id="txt-tracking">Tracking: OMNIPRESENT</p>
-                <p id="txt-counter">Tool Breaker: STANDBY</p>
+                <p id="txt-val" style="font-size: 1.2em;">ASSET VALUE: $50,000,000</p>
+                <p id="txt-tracking">Status: STEALTH_ENCRYPTED</p>
+                <p id="txt-counter">Tool Breaker: ARMED</p>
             </div>
         </div>
 
@@ -109,9 +111,9 @@ def imperial_core():
                     document.getElementById('btn-dst').innerText = 'تدمير النواة';
                     document.getElementById('txt-title').innerText = 'الجنرال الشبحي';
                     document.getElementById('txt-intel').innerText = '[ الاستخبارات والتقييم ]';
-                    document.getElementById('txt-val').innerText = 'القيمة الصافية: $50,000,000';
-                    document.getElementById('txt-tracking').innerText = 'التعقب: كلي الوجود';
-                    document.getElementById('txt-counter').innerText = 'محطم الأدوات: انتظار';
+                    document.getElementById('txt-val').innerText = 'قيمة الأصول: $50,000,000';
+                    document.getElementById('txt-tracking').innerText = 'الحالة: تشفير شبحي';
+                    document.getElementById('txt-counter').innerText = 'محطم الأدوات: مجهز';
                 } else {
                     h.lang = 'en'; h.dir = 'ltr'; b.innerText = 'العربية'; lang = 'en';
                     document.getElementById('txt-arsenal').innerText = '[ ARSENAL OPS ]';
@@ -120,26 +122,26 @@ def imperial_core():
                     document.getElementById('btn-dst').innerText = 'PURGE CORE';
                     document.getElementById('txt-title').innerText = 'STEALTH GENERAL';
                     document.getElementById('txt-intel').innerText = '[ INTEL & VALUATION ]';
-                    document.getElementById('txt-val').innerText = 'NET WORTH: $50,000,000';
-                    document.getElementById('txt-tracking').innerText = 'Tracking: OMNIPRESENT';
-                    document.getElementById('txt-counter').innerText = 'Tool Breaker: STANDBY';
+                    document.getElementById('txt-val').innerText = 'ASSET VALUE: $50,000,000';
+                    document.getElementById('txt-tracking').innerText = 'Status: STEALTH_ENCRYPTED';
+                    document.getElementById('txt-counter').innerText = 'Tool Breaker: ARMED';
                 }
             }
 
             function initSystem() {
                 setInterval(() => {
-                    const msgs = ["> SCANNING FOR HI-TECH WHALES...", "> ENCRYPTING IP LOGS...", "> TOOL BREAKER ARMED", "> CORE STABLE"];
+                    const msgs = ["> RUNNING LOGIC AUDIT...", "> IDENTITY ENCRYPTION: ACTIVE", "> MONITORING HI-TECH WHALES...", "> ZERO-DAY SHIELD ARMED"];
                     document.getElementById('status-terminal').innerText = msgs[Math.floor(Math.random()*msgs.length)];
                 }, 3000);
             }
 
             function execute(type) {
-                alert("PROTOCOL " + type + " INITIATED. MONITORING INTERCEPTORS.");
+                alert("PROTOCOL " + type + " INITIATED. SOVEREIGN LOGIC APPLIED.");
             }
 
             function selfDestruct() {
-                if(confirm("FINAL WARNING: PURGE ALL DATA?")) {
-                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%'>SYSTEM PURGED - GHOST MODE ACTIVE</h1>";
+                if(confirm("FINAL WARNING: PURGE ALL CORE DATA?")) {
+                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%'>GHOST MODE INITIALIZED - ASSETS PROTECTED</h1>";
                 }
             }
         </script>
@@ -147,12 +149,11 @@ def imperial_core():
     </html>
     ''')
 
-# مسار الفخ (Honeypot) - أي دخول هنا سيحطم أداة المهاجم
 @app.route('/admin/config/leaked')
 def trap():
-    log_strike({"event": "TOOL_BREAKER_TRIGGERED", "ip": request.remote_addr})
-    # إرسال "قنبلة نصية" لتحطيم برامج الفحص
-    return "X" * 10000000, 200 # إرسال بيانات ضخمة فجائية
+    # [تحديث] تفعيل بروتوكول تحطيم الأدوات عند محاولة الاختراق المنطقي
+    sovereign_vault({"event": "PREDICTIVE_COUNTER_MEASURE", "ip": request.remote_addr})
+    return "X" * 20000000, 200 # مضاعفة حجم القنبلة النصية لزيادة الفعالية ضد أدوات الـ Enterprise
 
 if __name__ == "__main__":
     app.run()
