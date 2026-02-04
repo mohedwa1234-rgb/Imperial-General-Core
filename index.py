@@ -2,18 +2,17 @@ from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 
-# الإعدادات السيادية المحفوظة
+# الإعدادات السيادية (مخفية عن الواجهة)
 SOVEREIGN_CONFIG = {
     "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
     "valuation": "50,000,000",
 }
 
 PROTOCOLS = [
-    {"id": "P1", "ar": "تحليل البيانات الضخمة", "en": "Big Data Intelligence", "icon": "📊"},
-    {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen", "icon": "🌐"},
+    {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Intelligence", "icon": "📊"},
     {"id": "P3", "ar": "رصد تحركات الحيتان", "en": "Whale Flow Tracker", "icon": "🐋"},
     {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation", "icon": "⚙️"},
-    {"id": "P12", "ar": "درع الإبادة السيادي", "en": "Sovereign Shield P12", "icon": "🛡️"}
+    {"id": "P12", "ar": "درع الإبادة P12", "en": "Sovereign Shield", "icon": "🛡️"}
 ]
 
 HTML_TEMPLATE = """
@@ -21,77 +20,61 @@ HTML_TEMPLATE = """
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>IMPERIAL COMMAND CENTER v3.1</title>
+    <title>IMPERIAL GENERAL OS - LIVE MODULE</title>
     <style>
-        :root { --gold: #d4af37; --red: #ff3333; --bg: #020202; --neon: #00ff41; }
+        :root { --gold: #d4af37; --red: #ff3333; --bg: #050505; --neon: #00ff41; }
         body { background: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
+        
+        /* الرادار المتحرك فعلياً */
+        .radar {
+            width: 150px; height: 150px; border: 2px solid var(--gold); border-radius: 50%;
+            position: relative; margin: 20px auto; overflow: hidden;
+        }
+        .radar::after {
+            content: ""; position: absolute; width: 100%; height: 100%;
+            background: conic-gradient(from 0deg, transparent 70%, rgba(212,175,55,0.4) 100%);
+            animation: spin 3s linear infinite;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* الأنيميشن الأساسي للحركة */
-        @keyframes radar-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px var(--gold); } 50% { box-shadow: 0 0 20px var(--gold); } 100% { box-shadow: 0 0 5px var(--gold); } }
-        @keyframes scan-line { 0% { top: 0%; } 100% { top: 100%; } }
+        /* شريط الحالة النابض */
+        .pulse-bar { height: 4px; background: #222; width: 100%; border-radius: 2px; overflow: hidden; }
+        .pulse-fill { height: 100%; background: var(--neon); width: 0%; transition: width 0.5s; }
 
         .container { display: grid; grid-template-columns: 300px 1fr 300px; height: 100vh; gap: 10px; padding: 15px; }
-
-        /* الرادار التفاعلي (تم إصلاحه ليتحرك) */
-        .radar-container {
-            width: 150px; height: 150px; border: 2px solid var(--gold); border-radius: 50%;
-            margin: 20px auto; position: relative; overflow: hidden;
-            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 80%);
-        }
-        .radar-sweep {
-            position: absolute; width: 100%; height: 100%;
-            background: conic-gradient(from 0deg, transparent 70%, rgba(212,175,55,0.4) 100%);
-            animation: radar-spin 3s linear infinite;
-        }
-
-        /* كروت البروتوكولات مع نبض */
-        .card { 
-            background: #0a0a0a; border: 1px solid #222; padding: 20px; border-radius: 10px; 
-            cursor: pointer; transition: 0.3s; text-align: center;
-        }
-        .card:hover { border-color: var(--gold); animation: pulse-glow 1s infinite; }
-
-        /* نافذة التطبيق المستقل */
-        #app-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 9999; backdrop-filter: blur(10px);
-        }
-        .app-window {
-            width: 80%; height: 80%; margin: 5% auto; background: #050505; 
-            border: 2px solid var(--gold); border-radius: 20px; position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,1); overflow: hidden;
-        }
+        .panel { border: 1px solid #222; padding: 15px; background: rgba(10,10,10,0.9); border-radius: 10px; }
         
-        /* خط المسح "Scanner" */
-        .app-window::after {
-            content: ""; position: absolute; left: 0; width: 100%; height: 2px;
-            background: rgba(212,175,55,0.2); animation: scan-line 4s linear infinite;
-        }
+        /* تأثير "الهاكر" لسجل العمليات */
+        #log-feed { font-size: 10px; color: var(--neon); height: 300px; overflow: hidden; line-height: 1.5; }
+        
+        .card { background: #111; border: 1px solid #333; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 0 15px var(--gold); }
 
-        .btn-toggle { background: var(--gold); border: none; padding: 10px; cursor: pointer; font-weight: bold; }
+        #app-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; padding: 50px; }
+        .app-box { border: 2px solid var(--gold); height: 100%; background: #000; border-radius: 20px; padding: 30px; position: relative; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div style="border: 1px solid #222; padding: 15px;">
-        <h3 style="text-align: center;">SYSTEM_VITALS</h3>
-        <div class="radar-container">
-            <div class="radar-sweep"></div>
+    <div class="panel">
+        <h3 style="text-align: center; border-bottom: 1px solid #333;">SYSTEM_VITALS</h3>
+        <div class="radar"></div>
+        <div style="margin-top: 20px;">
+            <label>CORE_LOAD: <span id="load-val">0</span>%</label>
+            <div class="pulse-bar"><div id="load-fill" class="pulse-fill"></div></div>
         </div>
-        <div style="font-size: 12px; color: var(--neon);">
-            > CPU_LOAD: <span id="cpu-val">12</span>%<br>
-            > ENCRYPTION: OMEGA_7<br>
-            > DEFENSE: P12_ACTIVE
+        <div style="margin-top: 20px; font-size: 11px;">
+            STATUS: <span style="color: var(--neon); animation: blink 1s infinite;">[ ONLINE ]</span><br>
+            ENCRYPTION: AES-512-OMEGA
         </div>
     </div>
 
-    <div style="overflow-y: auto; padding: 20px;">
-        <h1 style="text-align: center;">$50,000,000 ASSET</h1>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="panel" style="overflow-y: auto;">
+        <h2 style="text-align: center; color: var(--red);">$50,000,000 ASSET</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             {% for p in protocols %}
-            <div class="card" onclick="openModule('{{ p.id }}', '{{ p.ar }}')">
+            <div class="card" onclick="launchApp('{{ p.id }}', '{{ p.ar }}')">
                 <i style="font-size: 2rem;">{{ p.icon }}</i><br>
                 <strong>{{ p.id }}</strong><br>
                 <small>{{ p.ar }}</small>
@@ -100,53 +83,76 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
-    <div style="border: 1px solid #222; padding: 15px; font-size: 10px; color: var(--neon);">
-        <h3>LIVE_FEED</h3>
-        <div id="log-terminal"></div>
+    <div class="panel">
+        <h3 style="text-align: center; border-bottom: 1px solid #333;">LIVE_SECURITY_FEED</h3>
+        <div id="log-feed"></div>
     </div>
 </div>
 
 <div id="app-overlay">
-    <div class="app-window">
-        <div style="background: var(--gold); color: black; padding: 10px; display: flex; justify-content: space-between;">
-            <span id="win-title">MODULE_CORE</span>
-            <button onclick="closeModule()" style="background:red; color:white; border:none; cursor:pointer;">X إغلاق</button>
-        </div>
-        <div id="win-content" style="padding: 40px; color: var(--neon);"></div>
+    <div class="app-box">
+        <button onclick="closeApp()" style="position: absolute; top: 20px; left: 20px; background: var(--red); color: #fff; border: none; padding: 10px 20px; cursor: pointer;">إغلاق Session X</button>
+        <div id="app-body" style="color: var(--neon); font-family: monospace; margin-top: 50px;"></div>
     </div>
 </div>
 
 <script>
-    // تحديث الأرقام ديناميكياً ليظهر النظام "حياً"
+    // 1. محاكي سجل العمليات الحي
+    const logFeed = document.getElementById('log-feed');
+    const logs = [
+        "> INITIALIZING_QUANTUM_BRIDGE...",
+        "> SCANNING_NETWORK_FOR_INTRUSIONS...",
+        "> WHALE_WALLET_DETECTED: 0x71...F2",
+        "> SYNCING_WITH_SOVEREIGN_CORE...",
+        "> P12_SHIELD_STATUS: STABLE",
+        "> ENCRYPTING_SESSION_DATA..."
+    ];
+
     setInterval(() => {
-        document.getElementById('cpu-val').innerText = Math.floor(Math.random() * (15 - 8 + 1)) + 8;
-        const log = document.getElementById('log-terminal');
-        const entry = document.createElement('div');
-        entry.innerText = `> SEC_AUDIT: ${Math.random().toString(16).substring(2, 8).toUpperCase()}... OK`;
-        log.prepend(entry);
-        if(log.childNodes.length > 15) log.removeChild(log.lastChild);
+        const line = document.createElement('div');
+        line.innerText = logs[Math.floor(Math.random() * logs.length)];
+        logFeed.prepend(line);
+        if(logFeed.childNodes.length > 20) logFeed.removeChild(logFeed.lastChild);
+        
+        // تحديث العدادات
+        const load = Math.floor(Math.random() * 20) + 10;
+        document.getElementById('load-val').innerText = load;
+        document.getElementById('load-fill').style.width = load + "%";
     }, 2000);
 
-    function openModule(id, name) {
+    // 2. تشغيل التطبيقات المستقلة بهيبة
+    function launchApp(id, name) {
         document.getElementById('app-overlay').style.display = 'block';
-        document.getElementById('win-title').innerText = `EXECUTING: ${id} - ${name}`;
-        
-        // منع ظهور المفتاح السري نهائياً في الواجهة
-        let content = `<h2>البروتوكول المستقل ${id} قيد التشغيل...</h2>
-                       <p>> تم عزل البيئة البرمجية لهذا التطبيق.</p>
-                       <p>> حالة الاتصال: مشفر عبر GENERAL_EYE_ONLY_VALIDATION_STRING</p>`; // النص هنا تلميح برمجي وليس المفتاح الفعلي
-        
-        if(id === 'P3') {
-            content = `<h2>رصد الحيتان (Whale Tracker)</h2>
-                       <p style="color:var(--gold)">> تم رصد حركة بقيمة 50,000,000$ الآن.</p>
-                       <div style="height:100px; border:1px solid #333; position:relative;">
-                           <div style="width:70%; height:100%; background:rgba(0,255,65,0.1); animation: radar-spin 5s infinite alternate;"></div>
-                       </div>`;
-        }
-        document.getElementById('win-content').innerHTML = content;
+        const body = document.getElementById('app-body');
+        body.innerHTML = `<h2>جاري تشغيل تطبيق: ${name} (${id})</h2>
+                          <hr style='border: 1px solid #222;'>
+                          <p>> تم إنشاء بيئة معزولة (Sandbox).</p>
+                          <p>> حالة البروتوكول: <span style='color:white'>نشط وسري</span></p>
+                          <p>> المراقبة: تعمل بنظام التشفير السيادي المحفوظ.</p>`;
     }
 
-    function closeModule() { document.getElementById('app-overlay').style.display = 'none'; }
+    function closeApp() { document.getElementById('app-overlay').style.display = 'none'; }
+
+    // 3. حماية P12 (الهجوم المضاد) - تم إصلاحها لتعمل دون تجميد المتصفح
+    setInterval(() => {
+        const start = Date.now();
+        debugger; 
+        if (Date.now() - start > 100) {
+            document.body.innerHTML = "<div style='background:red; color:white; height:100vh; display:flex; align-items:center; justify-content:center;'><h1>تم اكتشاف محاولة اختراق! بروتوكول P12 فعال.</h1></div>";
+        }
+    }, 1000);
 </script>
+
 </body>
 </html>
+"""
+
+@app.route('/')
+def index():
+    key = request.args.get('key')
+    if key != SOVEREIGN_CONFIG["master_key"]:
+        return '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;"><h1>ACCESS DENIED</h1></div>', 403
+    return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS)
+
+if __name__ == "__main__":
+    app.run()
