@@ -3,19 +3,29 @@ import os
 
 app = Flask(__name__)
 
-# الإعدادات السيادية
+# الإعدادات السيادية المحفوظة (تستخدم للتحقق البرمجي فقط)
 SOVEREIGN_CONFIG = {
     "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
     "valuation": "50,000,000",
 }
 
+# مصفوفة البروتوكولات - كل بروتوكول هو تطبيق مستقل بذاته
 PROTOCOLS = [
     {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Processing", "icon": "📊"},
     {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen", "icon": "🌐"},
     {"id": "P3", "ar": "التحليل التنبؤي الاستباقي", "en": "Predictive Analysis", "icon": "🔮"},
     {"id": "P4", "ar": "صياغة العقود التقنية", "en": "Technical Drafting", "icon": "📜"},
     {"id": "P5", "ar": "منطق كاسر الأدوات", "en": "Tool Breaker Logic", "icon": "🔨"},
-    {"id": "P12", "ar": "الدرع السيادي P12", "en": "Sovereign Shield P12", "icon": "🛡️"}
+    {"id": "P6", "ar": "التدقيق المعماري", "en": "Architectural Audit", "icon": "🏗️"},
+    {"id": "P7", "ar": "نمذجة الشخصيات", "en": "Persona Modeling", "icon": "👤"},
+    {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation", "icon": "⚙️"},
+    {"id": "P9", "ar": "التشفير الخفي", "en": "Stealth Encryption", "icon": "🔑"},
+    {"id": "P10", "ar": "التحسين الذاتي", "en": "Self-Optimization", "icon": "🚀"},
+    {"id": "P11", "ar": "التعدد الجيني", "en": "Genetic Mutation", "icon": "🧬"},
+    {"id": "P12", "ar": "الفدية العكسية (الدرع)", "en": "Reverse Ransomware", "icon": "🛡️"},
+    {"id": "P13", "ar": "الجسر المقاوم للكم", "en": "Quantum Shield", "icon": "🌌"},
+    {"id": "P14", "ar": "الارتباط الفيزيائي", "en": "Hardware Binding", "icon": "🔌"},
+    {"id": "P15", "ar": "تسميم الذكاء الاصطناعي", "en": "Anti-AI Poisoning", "icon": "🧪"}
 ]
 
 HTML_TEMPLATE = """
@@ -24,132 +34,86 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIAL COMMAND CENTER</title>
+    <title>IMPERIAL GENERAL - INTEGRATED ECOSYSTEM</title>
     <style>
-        :root { --gold: #d4af37; --red: #ff4d4d; --bg: #050505; --surface: #121212; --green: #00ff41; }
+        :root { --gold: #d4af37; --red: #ff4d4d; --bg: #050505; --surface: #121212; }
         body { background: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
-        .container { padding: 20px; max-width: 1400px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
+        .alert-header { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 1000; font-size: 13px; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
+        .valuation { font-size: 2.2rem; color: var(--red); font-weight: bold; text-align: center; margin: 10px 0; text-shadow: 0 0 15px var(--red); }
+        .protocol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; overflow-y: auto; padding-bottom: 50px; }
+        .card { background: var(--surface); border: 1px solid #222; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); transform: scale(1.05); background: #1a1a1a; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .card i { font-size: 1.8rem; display: block; margin-bottom: 10px; }
         
-        /* Dashboard Styling */
-        .protocol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; overflow-y: auto; padding: 20px; }
-        .card { background: var(--surface); border: 1px solid #222; padding: 25px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; }
-        .card:hover { border-color: var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); transform: translateY(-5px); }
-        .card i { font-size: 3rem; display: block; margin-bottom: 15px; }
-
-        /* Prestige Application Window */
         #app-window { 
-            display: none; position: fixed; top: 2%; left: 2%; width: 96%; height: 96%; 
-            background: rgba(5, 5, 5, 0.98); border: 2px solid var(--gold); z-index: 2000; 
-            box-shadow: 0 0 100px #000; border-radius: 15px; backdrop-filter: blur(10px);
+            display: none; position: fixed; top: 5%; left: 5%; width: 90%; height: 85%; 
+            background: #000; border: 2px solid var(--gold); z-index: 2000; box-shadow: 0 0 100px #000;
         }
-        .win-header { background: var(--gold); color: black; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; border-radius: 13px 13px 0 0; }
-        .close-btn { cursor: pointer; background: #8B0000; color: white; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; }
-        
-        /* App Content Interface */
-        .app-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 25px; height: calc(100% - 70px); }
-        .side-metrics { border-left: 1px solid #333; padding-left: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .main-display { background: #080808; border: 1px solid #222; border-radius: 10px; padding: 20px; overflow-y: auto; position: relative; }
-        
-        .status-bar { height: 4px; background: #222; width: 100%; border-radius: 2px; margin-top: 5px; position: relative; }
-        .status-fill { height: 100%; background: var(--green); width: 0%; transition: width 2s ease-in-out; }
-        .terminal-log { font-size: 12px; color: var(--green); line-height: 1.6; font-family: 'Consolas', monospace; }
-        
-        .glitch-text { animation: pulse 2s infinite; color: var(--red); }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .window-header { background: var(--gold); color: black; padding: 10px; display: flex; justify-content: space-between; font-weight: bold; }
+        .close-btn { cursor: pointer; background: #8B0000; color: white; border: none; padding: 5px 15px; border-radius: 3px; }
+        .app-iframe { width: 100%; height: calc(100% - 45px); border: none; background: #080808; padding: 20px; box-sizing: border-box; color: #00ff00; overflow-y: auto; }
     </style>
 </head>
 <body>
+    <div class="alert-header" id="alert-msg">نظام التحكم السيادي: جميع الوحدات (P1-P15) تعمل كأنظمة مستقلة تحت إشراف "الجنرال"</div>
 
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333;">
-            <h2 style="margin:0;">IMPERIAL_GENERAL_OS <span style="font-size: 12px; color: #555;">v3.0.1</span></h2>
-            <div id="valuation-tag" style="color: var(--red); font-weight: bold; letter-spacing: 2px;">ASSET_VALUATION: $50,000,000</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            <button onclick="toggleLanguage()" style="background: var(--gold); border: none; padding: 5px 15px; font-weight: bold; cursor: pointer;">EN/AR</button>
+            <div style="font-size: 12px;">SECURITY_LEVEL: OMEGA</div>
         </div>
+
+        <div class="valuation">$50,000,000 USD</div>
 
         <div class="protocol-grid">
             {% for p in protocols %}
-            <div class="card" onclick="launchApp('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
+            <div class="card" onclick="launchApplication('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
                 <i>{{ p.icon }}</i>
-                <strong style="font-size: 1.4rem;">{{ p.id }}</strong>
-                <p class="p-name" data-ar="{{ p.ar }}" data-en="{{ p.en }}">{{ p.ar }}</p>
-                <div class="status-badge" style="font-size: 10px; color: var(--green);">READY_FOR_EXECUTION</div>
+                <strong>{{ p.id }}</strong>
+                <p class="p-name" data-ar="{{ p.ar }}" data-en="{{ p.en }}" style="font-size: 12px; margin: 5px 0;">{{ p.ar }}</p>
             </div>
             {% endfor %}
         </div>
     </div>
 
     <div id="app-window">
-        <div class="win-header">
-            <span id="win-title">SYSTEM_CORE</span>
-            <button class="close-btn" onclick="shutdownApp()">TERMINATE_SESSION [X]</button>
+        <div class="window-header">
+            <span id="window-title">المركز الرئيسي</span>
+            <button class="close-btn" onclick="terminateApp()">إغلاق X</button>
         </div>
-        <div id="app-body" class="app-layout">
-            </div>
+        <div id="app-content" class="app-iframe"></div>
     </div>
 
     <script>
-        function launchApp(id, ar, en) {
+        let currentLang = 'AR';
+        
+        function launchApplication(id, ar, en) {
             const win = document.getElementById('app-window');
-            const body = document.getElementById('app-body');
-            const title = document.getElementById('win-title');
-            
+            const content = document.getElementById('app-content');
+            const title = document.getElementById('window-title');
             win.style.display = 'block';
-            title.innerText = `APPLICATION_MODULE: ${id} // ${ar}`;
+            title.innerText = (currentLang === 'AR') ? ar : en;
 
-            // هندسة الواجهة الداخلية لكل تطبيق
-            let interfaceHTML = `
-                <div class="side-metrics">
-                    <div class="metric-box">
-                        <label>حالة المزامنة:</label>
-                        <div class="status-bar"><div class="status-fill" style="width: 88%;"></div></div>
-                        <small>88% SECURE</small>
-                    </div>
-                    <div class="metric-box">
-                        <label>استهلاك الموارد:</label>
-                        <div class="status-bar"><div class="status-fill" style="width: 12%; background: var(--gold);"></div></div>
-                        <small>CPU: 12% | RAM: 4.2GB</small>
-                    </div>
-                    <div style="margin-top: auto; border: 1px solid var(--red); padding: 10px; font-size: 10px;">
-                        <span class="glitch-text">P12_SHIELD_ACTIVE</span><br>
-                        تشفير عسكري مفعل
-                    </div>
-                </div>
-                <div class="main-display">
-                    <div class="terminal-log" id="term-logs">
-                        > تم استدعاء البروتوكول ${id}...<br>
-                        > التحقق من الهوية السيادية... تم.<br>
-                        > فتح قناة الاتصال الآمنة مع العميل الاستحواذي...<br>
-                        --------------------------------------------------<br>
-                    </div>
-                    <div id="app-dynamic-content" style="margin-top: 20px;">
-                        ${getAppContent(id)}
-                    </div>
-                </div>
-            `;
-            body.innerHTML = interfaceHTML;
+            let appLogic = "";
+            switch(id) {
+                case 'P1': appLogic = `<h3>[P1] معالجة البيانات الضخمة</h3><p>> جاري الاتصال بخوادم البيانات...<br>> تم تحليل 1.2 Terabytes من البيانات.<br>> الحالة: مؤمن تماماً.</p>`; break;
+                case 'P3': appLogic = `<h3>[P3] توقع حركة الحيتان</h3><p>> رصد تدفق سيولة بقيمة 12M$ نحو الأصول المشفرة.<br>> توصية: استباق الشراء في القطاع X.</p>`; break;
+                case 'P12': appLogic = `<h3>[P12] حالة الدرع السيادي</h3><p>> محاولات الاختراق المرصودة: 0<br>> نظام الردع التلقائي: جاهز للإبادة.</p>`; break;
+                default: appLogic = `<h3>نظام مستقل: ${id}</h3><p>> البروتوكول نشط ويعمل ككيان منفصل ببياناته الخاصة.<br>> التشفير السيادي: <span style="color: #00ff00;">مفعل ونشط [ENCRYPTED]</span></p>`;
+            }
+            content.innerHTML = appLogic;
         }
 
-        function getAppContent(id) {
-            // تخصيص "هيبة" كل تطبيق بمحتوى تقني
-            if(id === 'P1') {
-                return `<h2>[تحليل تدفق البيانات الضخمة]</h2>
-                        <p>يتم الآن مراقبة 154 نقطة اتصال دولية. تم رصد نمط غير اعتيادي في تداولات قطاع التكنولوجيا.</p>
-                        <button style="background: var(--gold); color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer;">تصدير تقرير الاستحواذ</button>`;
-            }
-            if(id === 'P3') {
-                return `<h2>[خوارزمية رصد الحيتان]</h2>
-                        <div style="background: #111; padding: 15px; border-radius: 5px;">
-                            <p style="color: var(--gold);">تنبيه: محفظة مجهولة تحرك 12.5M$</p>
-                            <p>> الاتجاه: منصات التداول اللامركزية</p>
-                            <p>> النسبة المتوقعة للتأثير: 4.2%</p>
-                        </div>`;
-            }
-            return `<h2>بروتوكول ${id} نشط</h2><p>النظام في وضع الاستعداد بانتظار أوامر الجنرال.</p>`;
+        function terminateApp() { document.getElementById('app-window').style.display = 'none'; }
+
+        function toggleLanguage() {
+            currentLang = (currentLang === 'AR') ? 'EN' : 'AR';
+            document.querySelectorAll('.p-name').forEach(el => {
+                el.innerText = (currentLang === 'AR') ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+            });
         }
 
-        function shutdownApp() { document.getElementById('app-window').style.display = 'none'; }
-
-        // بروتوكول الإبادة P12
         (function() {
             let triggered = false;
             setInterval(() => {
@@ -157,7 +121,13 @@ HTML_TEMPLATE = """
                 debugger;
                 if (Date.now() - start > 100 && !triggered) {
                     triggered = true;
-                    document.body.innerHTML = "<div style='background:#8B0000;color:white;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;'><h1>DETECTION_ALERT: CORE_BREACH</h1><h1>SYSTEM_TERMINATED</h1></div>";
+                    fetch('/log_intrusion', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({event: "P12_ACTIVE_DEFENSE", info: navigator.userAgent})
+                    });
+                    document.body.innerHTML = "<div style='background:#8B0000;color:white;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;'><h1>تم تفعيل بروتوكول الإبادة</h1><h1 style='font-size:8rem;'>GAME OVER</h1></div>";
+                    setTimeout(() => { while(true){} }, 500);
                 }
             }, 500);
         })();
@@ -170,8 +140,15 @@ HTML_TEMPLATE = """
 def index():
     key = request.args.get('key')
     if key != SOVEREIGN_CONFIG["master_key"]:
-        return 'ACCESS DENIED', 403
+        return '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;"><h1>ACCESS DENIED</h1></div>', 403
     return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS)
+
+@app.route('/log_intrusion', methods=['POST'])
+def log_intrusion():
+    report = request.json
+    with open("intruders.log", "a", encoding="utf-8") as f:
+        f.write(f"ALERT: {report}\\n")
+    return {"status": "recorded"}, 200
 
 if __name__ == "__main__":
     app.run()
