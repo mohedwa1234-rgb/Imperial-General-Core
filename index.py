@@ -1,177 +1,124 @@
 from flask import Flask, request, render_template_string
+import random
 
 app = Flask(__name__)
 
-# الإعدادات السيادية الثابتة
-SOVEREIGN_CONFIG = {
-    "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
-    "valuation": "50,000,000",
-}
+# الإعدادات السيادية
+SOVEREIGN_CONFIG = {"master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING"}
 
-# القائمة الكاملة (15 بروتوكول) لضمان "الهيبة"
 PROTOCOLS = [
     {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Intelligence", "icon": "📊"},
-    {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen", "icon": "🌐"},
     {"id": "P3", "ar": "رصد تحركات الحيتان", "en": "Whale Flow Tracker", "icon": "🐋"},
-    {"id": "P4", "ar": "صياغة العقود التقنية", "en": "Legal-Tech Engine", "icon": "📜"},
-    {"id": "P5", "ar": "منطق كاسر الأدوات", "en": "Tool Breaker Logic", "icon": "🔨"},
     {"id": "P6", "ar": "التدقيق المعماري", "en": "Architectural Audit", "icon": "🏗️"},
-    {"id": "P7", "ar": "النمذجة الشخصية", "en": "Persona Modeling", "icon": "👤"},
-    {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation", "icon": "⚙️"},
-    {"id": "P9", "ar": "التشفير اللغوي", "en": "Linguistic Encryption", "icon": "🔐"},
-    {"id": "P10", "ar": "التحليل التنبؤي", "en": "Predictive Analysis", "icon": "🔮"},
-    {"id": "P11", "ar": "محاكي الهجمات", "en": "Attack Simulator", "icon": "⚔️"},
-    {"id": "P12", "ar": "درع الإبادة P12", "en": "Sovereign Shield", "icon": "🛡️"},
-    {"id": "P13", "ar": "الربط السياقي", "en": "Contextual Linking", "icon": "🔗"},
-    {"id": "P14", "ar": "التحليل الجنائي", "en": "Forensic Audit", "icon": "🔎"},
-    {"id": "P15", "ar": "خارطة الطريق الاستراتيجية", "en": "Strategic Roadmap", "icon": "🗺️"}
+    {"id": "P12", "ar": "درع الإبادة P12", "en": "Sovereign Shield", "icon": "🛡️"}
 ]
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="main-html">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>IMPERIAL GENERAL OS v4.0</title>
+    <title>IMPERIAL GENERAL OS v5.0</title>
     <style>
-        :root { --gold: #d4af37; --red: #ff3333; --bg: #020202; --neon: #00ff41; }
-        body { background: var(--bg); color: var(--gold); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; overflow: hidden; height: 100vh; }
+        :root { --gold: #d4af37; --neon: #00ff41; --bg: #020202; --red: #ff3333; }
+        body { background: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
         
-        .main-container { display: grid; grid-template-columns: 320px 1fr 320px; height: 100vh; gap: 10px; padding: 15px; box-sizing: border-box; }
-        .panel { border: 1px solid #1a1a1a; background: rgba(5,5,5,0.95); border-radius: 12px; padding: 15px; position: relative; overflow: hidden; }
+        .main-ui { display: grid; grid-template-columns: 300px 1fr; height: 100vh; padding: 10px; gap: 10px; }
+        .panel { border: 1px solid #222; background: #050505; border-radius: 8px; padding: 15px; position: relative; }
         
-        /* الرادار المتحرك */
-        .radar-box { width: 120px; height: 120px; border: 1px solid var(--gold); border-radius: 50%; margin: 10px auto; position: relative; overflow: hidden; }
-        .radar-box::after { content: ""; position: absolute; width: 100%; height: 100%; background: conic-gradient(from 0deg, transparent 70%, rgba(212,175,55,0.3) 100%); animation: spin 4s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* تأثيرات الحركة (النبض التفاعلي) */
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        @keyframes blink { 50% { opacity: 0.3; } }
 
-        /* شبكة البروتوكولات (15 زر) */
-        .protocol-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; height: 75vh; overflow-y: auto; scrollbar-width: none; }
-        .card { background: #0a0a0a; border: 1px solid #222; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.2); transform: translateY(-3px); }
-        .card i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-        .card span { font-size: 10px; display: block; height: 30px; }
+        .protocol-btn { background: #111; border: 1px solid #333; padding: 20px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; text-align: right; width: 100%; color: var(--gold); }
+        .protocol-btn:hover { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.2); }
 
-        /* زر تبديل اللغة */
-        .lang-toggle { position: absolute; top: 10px; right: 10px; background: var(--gold); color: #000; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; z-index: 100; }
-
-        #log-terminal { font-size: 9px; color: var(--neon); line-height: 1.4; font-family: 'Consolas', monospace; }
-        .stat-line { margin-bottom: 10px; font-size: 11px; }
-        .progress { height: 3px; background: #222; margin-top: 4px; border-radius: 2px; }
-        .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: 1s; }
+        /* نافذة التنفيذ (مملوءة بالبيانات) */
+        #app-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; padding: 30px; box-sizing: border-box; }
+        .app-window { border: 2px solid var(--gold); height: 100%; background: #000; border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .app-window::after { content: ""; position: absolute; width: 100%; height: 2px; background: rgba(212,175,55,0.1); animation: scan 3s linear infinite; top: 0; }
         
-        #app-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; }
-        .app-window { width: 90%; height: 90%; margin: 2% auto; border: 1px solid var(--gold); background: #000; border-radius: 15px; display: flex; flex-direction: column; }
+        .data-stream { flex-grow: 1; padding: 20px; color: var(--neon); font-size: 13px; overflow-y: auto; scrollbar-width: none; }
+        .visual-bars { display: flex; align-items: flex-end; gap: 5px; height: 100px; padding: 10px; border-bottom: 1px solid #222; }
+        .bar { width: 15px; background: var(--gold); animation: grow 0.5s ease-in-out infinite alternate; }
+        @keyframes grow { from { height: 10%; } to { height: 100%; } }
     </style>
 </head>
 <body>
 
-<button class="lang-toggle" onclick="toggleLanguage()">English</button>
-
-<div class="main-container">
+<div class="main-ui">
     <div class="panel">
-        <h4 style="text-align: center; border-bottom: 1px solid #222; padding-bottom: 5px;">LIVE_SECURITY_FEED</h4>
-        <div id="log-terminal"></div>
+        <h3 style="text-align:center;">PROTOCOL_CONTROL</h3>
+        {% for p in protocols %}
+        <button class="protocol-btn" onclick="openApp('{{ p.id }}', '{{ p.ar }}')">
+            <span>{{ p.icon }}</span> <strong>{{ p.id }}</strong><br>
+            <small style="font-size: 9px;">{{ p.ar }}</small>
+        </button>
+        {% endfor %}
     </div>
-
-    <div class="panel" style="text-align: center;">
-        <h1 id="header-val" style="color: var(--red); font-size: 1.2rem; margin: 0;">ASSET_VALUATION: $50,000,000</h1>
-        <p style="font-size: 10px; letter-spacing: 3px;">IMPERIAL_GENERAL_OS_v4.0</p>
-        
-        <div class="protocol-grid">
-            {% for p in protocols %}
-            <div class="card" onclick="runProtocol('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
-                <i>{{ p.icon }}</i>
-                <strong style="color: white;">{{ p.id }}</strong>
-                <span class="p-name" data-ar="{{ p.ar }}" data-en="{{ p.en }}">{{ p.ar }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="panel">
-        <h4 style="text-align: center; border-bottom: 1px solid #222; padding-bottom: 5px;">SYSTEM_VITALS</h4>
-        <div class="radar-box"></div>
-        <div class="stat-line">
-            <label id="lbl-enc">CORE_ENCRYPTION: OMEGA</label>
-            <div class="progress"><div class="progress-fill" style="width: 100%; background: var(--neon);"></div></div>
-        </div>
-        <div class="stat-line">
-            <label id="lbl-load">NETWORK_TRAFFIC</label>
-            <div class="progress"><div id="load-bar" class="progress-fill" style="width: 45%;"></div></div>
-        </div>
-        <div style="margin-top: 20px; color: var(--red); font-size: 11px; text-align: center;">
-            [ P12_SENTINEL_ARMED ]
+    
+    <div class="panel" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <h1 style="color:var(--red); font-size: 3rem; margin:0;">$50,000,000</h1>
+        <p style="letter-spacing: 10px;">SYSTEM_ACTIVE</p>
+        <div style="width:200px; height:200px; border:2px solid var(--gold); border-radius:50%; position:relative; overflow:hidden;">
+            <div style="position:absolute; width:100%; height:100%; background:conic-gradient(from 0deg, transparent 70%, var(--gold) 100%); animation: spin 2s linear infinite; opacity: 0.3;"></div>
         </div>
     </div>
 </div>
 
 <div id="app-overlay">
     <div class="app-window">
-        <div style="background: var(--gold); color: #000; padding: 10px 20px; display: flex; justify-content: space-between; font-weight: bold;">
-            <span id="win-title">PROTOCOL_ACCESS</span>
-            <button onclick="closeApp()" style="background: #800; color: #fff; border: none; cursor: pointer; padding: 2px 10px;">X</button>
+        <div style="background:var(--gold); color:#000; padding:10px 20px; font-weight:bold; display:flex; justify-content:space-between;">
+            <span id="win-title">EXECUTING_MODULE</span>
+            <button onclick="closeApp()" style="background:var(--red); border:none; color:#fff; cursor:pointer;">CLOSE_SESSION [X]</button>
         </div>
-        <div id="win-body" style="padding: 30px; color: var(--neon); font-family: monospace; overflow-y: auto;"></div>
+        
+        <div class="visual-bars" id="bars-container"></div>
+        
+        <div class="data-stream" id="stream-body"></div>
     </div>
 </div>
 
 <script>
-    let currentLang = 'ar';
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'ar' ? 'en' : 'ar';
-        const btn = document.querySelector('.lang-toggle');
-        const html = document.getElementById('main-html');
-        
-        btn.innerText = currentLang === 'ar' ? 'English' : 'العربية';
-        html.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-        html.lang = currentLang === 'ar' ? 'ar' : 'en';
-
-        // تحديث أسماء الأزرار
-        document.querySelectorAll('.p-name').forEach(el => {
-            el.innerText = currentLang === 'ar' ? el.getAttribute('data-ar') : el.getAttribute('data-en');
-        });
-
-        // تحديث العناوين
-        document.getElementById('lbl-enc').innerText = currentLang === 'ar' ? 'تشفير النواة: OMEGA' : 'CORE_ENCRYPTION: OMEGA';
-        document.getElementById('lbl-load').innerText = currentLang === 'ar' ? 'حركة الشبكة' : 'NETWORK_TRAFFIC';
-    }
-
-    // سجل حي (تفاعلي)
-    const logs = ["> SCANNING...", "> P12_ACTIVE", "> WHALE_DETECTED", "> SYNC_OK", "> ENCRYPTING..."];
-    setInterval(() => {
-        const terminal = document.getElementById('log-terminal');
-        const line = document.createElement('div');
-        line.innerText = `[${new Date().toLocaleTimeString()}] ` + logs[Math.floor(Math.random() * logs.length)];
-        terminal.prepend(line);
-        if(terminal.childNodes.length > 25) terminal.removeChild(terminal.lastChild);
-        
-        document.getElementById('load-bar').style.width = (Math.random() * 60 + 20) + "%";
-    }, 1500);
-
-    function runProtocol(id, ar, en) {
+    function openApp(id, name) {
         document.getElementById('app-overlay').style.display = 'block';
-        const title = currentLang === 'ar' ? ar : en;
-        document.getElementById('win-title').innerText = `EXECUTING: ${id} // ${title}`;
-        document.getElementById('win-body').innerHTML = `
-            <h2>Initializing Sovereign Module ${id}...</h2>
-            <p>> Secure Connection: Established</p>
-            <p>> Environment: Sandbox Zero-Day Protected</p>
-            <p>> Master Key Status: <span style="color:white">VALIDATED</span></p>
-            <hr style="border:1px solid #222">
-            <p>> ${currentLang === 'ar' ? 'جاري سحب البيانات...' : 'Fetching Data Logs...'}</p>
-        `;
+        document.getElementById('win-title').innerText = `MODULE: ${id} // ${name}`;
+        
+        const stream = document.getElementById('stream-body');
+        const bars = document.getElementById('bars-container');
+        stream.innerHTML = "> Initializing Sovereign Bridge...<br>> Connection: SECURE<br>> سحب البيانات الاستراتيجية...<br>";
+        bars.innerHTML = "";
+
+        // إنشاء أعمدة بيانية تتحرك (ملء الفراغ البصري)
+        for(let i=0; i<30; i++) {
+            let b = document.createElement('div');
+            b.className = 'bar';
+            b.style.animationDelay = (i * 0.1) + 's';
+            bars.appendChild(b);
+        }
+
+        // محاكاة سحب بيانات لا تنتهي (ملء الفراغ النصي)
+        const fakeData = [
+            "> [TRACE] محاولة وصول من IP 192.168.1.1 - تم الحظر.",
+            "> [DATA] تم فك تشفير حزمة البيانات رقم " + Math.random().toString(16).slice(2,8),
+            "> [WHALE] محفظة حوت نشطة بقيمة 12.4M USD.",
+            "> [SYNC] مزامنة النواة مع خادم Vercel... 100%",
+            "> [P12] الدرع السيادي يعمل بكامل طاقته."
+        ];
+
+        window.dataInterval = setInterval(() => {
+            let line = document.createElement('div');
+            line.innerText = fakeData[Math.floor(Math.random() * fakeData.length)];
+            stream.prepend(line);
+        }, 800);
     }
 
-    function closeApp() { document.getElementById('app-overlay').style.display = 'none'; }
-
-    // حماية P12 ضد "كين"
-    setInterval(() => {
-        const t = Date.now(); debugger;
-        if(Date.now()-t > 100) document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%'>P12_COUNTER_MEASURE: ACCESS_REVOKED</h1>";
-    }, 1000);
+    function closeApp() { 
+        document.getElementById('app-overlay').style.display = 'none'; 
+        clearInterval(window.dataInterval);
+    }
 </script>
+<style> @keyframes spin { to { transform: rotate(360deg); } } </style>
 </body>
 </html>
 """
@@ -180,8 +127,5 @@ HTML_TEMPLATE = """
 def index():
     key = request.args.get('key')
     if key != SOVEREIGN_CONFIG["master_key"]:
-        return '<div style="background:#000;color:red;height:100vh;display:flex;align-items:center;justify-content:center;"><h1>INVALID KEY</h1></div>', 403
+        return '<h1 style="color:red; text-align:center;">ACCESS DENIED</h1>', 403
     return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS)
-
-if __name__ == "__main__":
-    app.run()
