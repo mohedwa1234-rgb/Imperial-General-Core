@@ -2,129 +2,140 @@ from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 
-# الإعدادات السيادية
-CONFIG = {
+# الإعدادات الاستراتيجية للمنظومة
+SOVEREIGN_CONFIG = {
     "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
     "valuation": "50,000,000",
 }
 
+# مصفوفة البروتوكولات الكاملة (P1-P15)
+PROTOCOLS = [
+    {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Processing"},
+    {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen"},
+    {"id": "P3", "ar": "التحليل التنبؤي الاستباقي", "en": "Predictive Analysis"},
+    {"id": "P4", "ar": "صياغة العقود التقنية", "en": "Technical Drafting"},
+    {"id": "P5", "ar": "منطق كاسر الأدوات", "en": "Tool Breaker Logic"},
+    {"id": "P6", "ar": "التدقيق المعماري", "en": "Architectural Audit"},
+    {"id": "P7", "ar": "نمذجة الشخصيات", "en": "Persona Modeling"},
+    {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation"},
+    {"id": "P9", "ar": "التشفير الخفي", "en": "Stealth Encryption"},
+    {"id": "P10", "ar": "التحسين الذاتي", "en": "Self-Optimization"},
+    {"id": "P11", "ar": "التعدد الجيني", "en": "Genetic Mutation"},
+    {"id": "P12", "ar": "الفدية العكسية", "en": "Reverse Ransomware"},
+    {"id": "P13", "ar": "الجسر المقاوم للكم", "en": "Quantum Shield"},
+    {"id": "P14", "ar": "الارتباط الفيزيائي", "en": "Hardware Binding"},
+    {"id": "P15", "ar": "تسميم الذكاء الاصطناعي", "en": "Anti-AI Poisoning"}
+]
+
 HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="main-html">
+<html lang="ar" dir="rtl" id="sovereign-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IMPERIAL GENERAL - COMMAND CENTER</title>
     <style>
-        :root { --gold: #d4af37; --red: #ff4d4d; --bg: #050505; }
-        body { background-color: var(--bg); color: var(--gold); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --gold: #d4af37; --red: #ff4d4d; --bg: #050505; --surface: #121212; }
+        body { background-color: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* شريط التحذير العلوي */
-        .status-header { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: bold; font-size: 0.9em; box-shadow: 0 0 15px var(--red); width: 100%; position: sticky; top: 0; z-index: 1000; }
+        .alert-header { background: var(--red); color: black; padding: 12px; text-align: center; font-weight: bold; font-size: 14px; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); z-index: 100; position: sticky; top: 0; }
 
-        .dashboard { display: flex; flex-direction: column; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; display: flex; flex-direction: column; }
         
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .lang-btn { background: var(--gold); color: black; border: none; padding: 8px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.8em; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .lang-toggle { background: var(--gold); color: black; border: none; padding: 10px 18px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
 
-        .radar-section { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .radar { width: 100px; height: 100px; border: 2px solid var(--gold); border-radius: 50%; position: relative; overflow: hidden; }
-        .sweep { width: 100%; height: 100%; background: conic-gradient(from 0deg, transparent, rgba(212, 175, 55, 0.4)); animation: rotate 3s linear infinite; border-radius: 50%; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-section { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .radar-box { width: 120px; height: 120px; border: 2px solid var(--gold); border-radius: 50%; position: relative; overflow: hidden; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); }
+        .radar-sweep { width: 100%; height: 100%; background: conic-gradient(from 0deg, transparent, rgba(212, 175, 55, 0.4)); animation: sweep 3s linear infinite; border-radius: 50%; }
+        @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .valuation { font-size: 2.5rem; color: var(--red); font-weight: bold; text-shadow: 0 0 20px var(--red); text-align: center; }
 
-        .valuation { font-size: 2.2em; color: var(--red); text-shadow: 0 0 15px var(--red); font-weight: bold; text-align: center; }
+        #console { background: #000; border: 1px solid #d4af37; color: #00ff00; padding: 15px; font-size: 13px; height: 60px; margin-bottom: 25px; overflow-y: auto; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,255,0,0.1); }
 
-        /* منطقة التفاعل - الكونسول */
-        #console-output { background: #111; border: 1px solid #333; padding: 12px; min-height: 60px; margin: 15px 0; font-family: 'Courier New'; color: #00ff00; font-size: 0.85em; border-right: 4px solid var(--gold); word-wrap: break-word; }
+        .protocol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .card { background: var(--surface); border: 1px solid #222; padding: 15px; text-align: center; border-radius: 4px; transition: all 0.2s ease; cursor: pointer; }
+        .card:hover { border-color: var(--gold); transform: translateY(-3px); background: #1a1a1a; }
+        .card strong { display: block; font-size: 16px; margin-bottom: 5px; }
+        .card span { font-size: 11px; color: #888; display: block; margin-bottom: 8px; }
+        .status-badge { color: #00ff00; font-size: 10px; font-weight: bold; letter-spacing: 1px; border: 1px solid #00ff0033; padding: 2px 6px; border-radius: 2px; }
 
-        /* شبكة البروتوكولات - متجاوبة للجوال واللابتوب */
-        .protocol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; width: 100%; }
-        .protocol-card { background: #1a1a1a; border: 1px solid #333; padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
-        .protocol-card:active { transform: scale(0.95); background: #222; }
-        .protocol-card span { display: block; font-size: 0.75em; margin-top: 5px; color: #888; }
-        .active-tag { color: #00ff00 !important; font-weight: bold; font-size: 0.7em !important; }
+        .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #444; padding: 20px; border-top: 1px solid #222; }
 
-        .footer { margin-top: auto; text-align: center; font-size: 0.7em; color: #444; padding: 20px 0; border-top: 1px solid #222; }
-
-        @media (min-width: 768px) {
-            .valuation { font-size: 3.5em; }
-            .radar-section { flex-direction: row; justify-content: center; gap: 50px; }
-            .status-header { font-size: 1.1em; }
+        @media (max-width: 600px) {
+            .valuation { font-size: 1.8rem; }
+            .protocol-grid { grid-template-columns: 1fr 1fr; }
+            .radar-box { width: 100px; height: 100px; }
         }
     </style>
 </head>
 <body>
-    <div class="status-header" id="alert-text">كامل البروتوكولات السيادية من 1 إلى 15 نشطة وتعمل تحت إشراف "الجنرال"</div>
+    <div class="alert-header" id="alert-msg">النظام السيادي: البروتوكولات P1-P15 تعمل بكامل طاقتها</div>
 
-    <div class="dashboard">
-        <div class="top-nav">
-            <button class="lang-btn" onclick="toggleLang()" id="lang-btn">Switch to English</button>
-            <div style="letter-spacing: 2px; font-size: 0.9em;">IMPERIAL GENERAL CORE</div>
+    <div class="container">
+        <div class="header">
+            <button class="lang-toggle" onclick="toggleLanguage()" id="lang-btn">Switch to English</button>
+            <div style="font-size: 14px; font-weight: bold;">IMPERIAL COMMAND v2.2</div>
         </div>
 
-        <div class="radar-section">
-            <div class="radar"><div class="sweep"></div></div>
-            <div class="valuation" id="val-text">$50,000,000 USD</div>
+        <div class="hero-section">
+            <div class="radar-box"><div class="radar-sweep"></div></div>
+            <div class="valuation">$50,000,000 USD</div>
         </div>
 
-        <div id="console-output">> نظام الجنرال مستعد... البروتوكولات الـ 15 مؤمنة بالكامل.</div>
+        <div id="console">> تم التحقق من الهوية.. مرحباً أيها الجنرال.</div>
 
-        <div class="protocol-grid" id="grid">
+        <div class="protocol-grid">
+            {% for p in protocols %}
+            <div class="card" onclick="logAction('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
+                <strong>{{ p.id }}</strong>
+                <span class="p-name" data-ar="{{ p.ar }}" data-en="{{ p.en }}">{{ p.ar }}</span>
+                <div class="status-badge" id="status-{{ p.id }}">ACTIVE</div>
             </div>
+            {% endfor %}
+        </div>
 
         <div class="footer">
-            <span id="footer-text">نظام الإمبراطورية v2.2 | تم التحقق من الهوية السيادية</span><br>
-            MASTER_KEY: GENERAL_EYE_ONLY_VALIDATION_STRING
+            <p>MASTER_KEY_VERIFIED: GENERAL_EYE_ONLY_VALIDATION_STRING</p>
+            <p>© 2026 IMPERIAL CYBER-GENERAL ECOSYSTEM</p>
         </div>
     </div>
 
     <script>
-        const protocols = [
-            {id: "P1", ar: "البيانات الضخمة", en: "Big Data"}, {id: "P2", ar: "توليد المنصات", en: "Platform Gen"},
-            {id: "P3", ar: "التحليل التنبؤي", en: "Predictive"}, {id: "P4", ar: "العقود التقنية", en: "Contracts"},
-            {id: "P5", ar: "كاسر الأدوات", en: "Tool Breaker"}, {id: "P6", ar: "التدقيق المعماري", en: "Audit"},
-            {id: "P7", ar: "نمذجة الشخصيات", en: "Persona"}, {id: "P8", ar: "الأتمتة", en: "Automation"},
-            {id: "P9", ar: "التشفير الخفي", en: "Encryption"}, {id: "P10", ar: "التحسين الذاتي", en: "Self-Opt"},
-            {id: "P11", ar: "التعدد الجيني", en: "Genetic"}, {id: "P12", ar: "الفدية العكسية", en: "Reverse Payload"},
-            {id: "P13", ar: "الجسر الكمي", en: "Quantum Bridge"}, {id: "P14", ar: "الارتباط المادي", en: "Hardware Lock"},
-            {id: "P15", ar: "تسميم الذكاء", en: "AI Poisoning"}
-        ];
-
         let currentLang = 'AR';
-
-        function renderGrid() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-            protocols.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'protocol-card';
-                card.innerHTML = `<strong>${p.id}</strong><span>${currentLang === 'AR' ? p.ar : p.en}</span>
-                                  <span class="active-tag">${currentLang === 'AR' ? 'نشط' : 'ACTIVE'}</span>`;
-                card.onclick = () => interact(p.id, currentLang === 'AR' ? p.ar : p.en);
-                grid.appendChild(card);
+        
+        function toggleLanguage() {
+            currentLang = (currentLang === 'AR') ? 'EN' : 'AR';
+            const root = document.getElementById('sovereign-root');
+            const btn = document.getElementById('lang-btn');
+            const alertMsg = document.getElementById('alert-msg');
+            
+            root.dir = (currentLang === 'AR') ? 'rtl' : 'ltr';
+            root.lang = (currentLang === 'AR') ? 'ar' : 'en';
+            btn.innerText = (currentLang === 'AR') ? 'Switch to English' : 'التحويل للعربية';
+            alertMsg.innerText = (currentLang === 'AR') ? 'النظام السيادي: البروتوكولات P1-P15 تعمل بكامل طاقتها' : 'SOVEREIGN SYSTEM: PROTOCOLS P1-P15 FULLY OPERATIONAL';
+            
+            document.querySelectorAll('.p-name').forEach(el => {
+                el.innerText = (currentLang === 'AR') ? el.getAttribute('data-ar') : el.getAttribute('data-en');
             });
+
+            document.getElementById('console').innerText = (currentLang === 'AR') ? '> تم تغيير إعدادات اللغة بنجاح.' : '> Language settings updated successfully.';
         }
 
-        function interact(id, name) {
-            const out = document.getElementById('console-output');
-            out.innerText = currentLang === 'AR' ? `> تم فحص [${id} - ${name}]: الحالة 100% نشط.` : `> Interrogating [${id} - ${name}]: Status 100% ACTIVE.`;
-            out.style.color = '#fff';
-            setTimeout(() => { out.style.color = '#00ff00'; }, 150);
+        function logAction(id, ar, en) {
+            const consoleBox = document.getElementById('console');
+            const name = (currentLang === 'AR') ? ar : en;
+            consoleBox.innerText = (currentLang === 'AR') ? `> تم فحص المسار ${id}: [${name}].. الحالة: 100% مؤمن.` : `> Interrogating ${id}: [${name}].. Status: 100% SECURE.`;
         }
-
-        function toggleLang() {
-            currentLang = currentLang === 'AR' ? 'EN' : 'AR';
-            const html = document.getElementById('main-html');
-            html.dir = currentLang === 'AR' ? 'rtl' : 'ltr';
-            
-            document.getElementById('lang-btn').innerText = currentLang === 'AR' ? 'Switch to English' : 'التحويل للعربية';
-            document.getElementById('alert-text').innerText = currentLang === 'AR' ? 'كامل البروتوكولات السيادية من 1 إلى 15 نشطة وتعمل تحت إشراف "الجنرال"' : 'SOVEREIGN PROTOCOLS P1-P15: FULLY ACTIVE AND OPERATIONAL';
-            document.getElementById('footer-text').innerText = currentLang === 'AR' ? 'نظام الإمبراطورية v2.2 | تم التحقق من الهوية السيادية' : 'IMPERIAL SYSTEM v2.2 | SOVEREIGN IDENTITY VERIFIED';
-            
-            renderGrid();
-        }
-
-        renderGrid();
     </script>
 </body>
 </html>
+"""
+
+@app.route('/')
+def index():
+    key = request.args.get('key')
+    if key != SOVEREIGN_CONFIG["master_key"]:
+        return '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;"><h1>ACCESS DENIED: INVALID SOVEREIGN KEY</h1></div>', 403
+    return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS)
