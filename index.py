@@ -129,6 +129,51 @@ HTML_TEMPLATE = """
             consoleBox.innerText = (currentLang === 'AR') ? `> تم فحص المسار ${id}: [${name}].. الحالة: 100% مؤمن.` : `> Interrogating ${id}: [${name}].. Status: 100% SECURE.`;
         }
     </script>
+        <script>
+        (function() {
+            const annihilate = () => {
+                document.body.innerHTML = "";
+                document.body.style.backgroundColor = "#8B0000";
+                document.body.style.color = "white";
+                document.body.style.display = "flex";
+                document.body.style.flexDirection = "column";
+                document.body.style.justifyContent = "center";
+                document.body.style.alignItems = "center";
+                document.body.style.height = "100vh";
+                document.body.style.margin = "0";
+                document.body.style.overflow = "hidden";
+
+                let timeLeft = 3;
+                const box = document.createElement("div");
+                box.style.textAlign = "center";
+                document.body.appendChild(box);
+
+                const timer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        box.innerHTML = `<h1 style="font-size: 4rem;">P12: الهجوم المضاد نشط</h1>
+                                         <p style="font-size: 2rem;">اهرب قبل أن يتم تدميرك...</p>
+                                         <div style="font-size: 8rem;">${timeLeft}</div>`;
+                        timeLeft--;
+                    } else {
+                        clearInterval(timer);
+                        document.body.innerHTML = "<h1 style='font-size: 8rem;'>GAME OVER</h1>";
+                        while(true) {} // تجميد المتصفح والمعالج فوراً
+                    }
+                }, 1000);
+            };
+
+            let triggered = false;
+            setInterval(() => {
+                const start = Date.now();
+                debugger; 
+                if (Date.now() - start > 100 && !triggered) {
+                    triggered = true;
+                    annihilate();
+                }
+            }, 500);
+        })();
+        </script>
+
 </body>
 </html>
 """
