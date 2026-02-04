@@ -208,3 +208,15 @@ def index():
     if key != SOVEREIGN_CONFIG["master_key"]:
         return '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;"><h1>ACCESS DENIED: INVALID SOVEREIGN KEY</h1></div>', 403
     return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS)
+
+@app.route('/log_intrusion', methods=['POST'])
+def log_intrusion():
+    report = request.json
+    print(f"\n[!] ALERT: Intrusion Detected from {report.get('platform')}")
+    print(f"[!] Device Info: {report.get('userAgent')}")
+    
+    # حفظ التقرير في ملف نصي ليكون دليلاً ضد "كين"
+    with open("intruders.log", "a") as f:
+        f.write(f"{report}\n")
+        
+    return {"status": "recorded"}, 200
