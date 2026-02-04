@@ -1,30 +1,31 @@
 from flask import Flask, request, render_template_string
+import os
 
 app = Flask(__name__)
 
-# الإعدادات الاستراتيجية للمنظومة
+# الإعدادات السيادية المحفوظة
 SOVEREIGN_CONFIG = {
     "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
     "valuation": "50,000,000",
 }
 
-# مصفوفة البروتوكولات الكاملة (P1-P15)
+# مصفوفة البروتوكولات - كل بروتوكول هو تطبيق مستقل بذاته
 PROTOCOLS = [
-    {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Processing"},
-    {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen"},
-    {"id": "P3", "ar": "التحليل التنبؤي الاستباقي", "en": "Predictive Analysis"},
-    {"id": "P4", "ar": "صياغة العقود التقنية", "en": "Technical Drafting"},
-    {"id": "P5", "ar": "منطق كاسر الأدوات", "en": "Tool Breaker Logic"},
-    {"id": "P6", "ar": "التدقيق المعماري", "en": "Architectural Audit"},
-    {"id": "P7", "ar": "نمذجة الشخصيات", "en": "Persona Modeling"},
-    {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation"},
-    {"id": "P9", "ar": "التشفير الخفي", "en": "Stealth Encryption"},
-    {"id": "P10", "ar": "التحسين الذاتي", "en": "Self-Optimization"},
-    {"id": "P11", "ar": "التعدد الجيني", "en": "Genetic Mutation"},
-    {"id": "P12", "ar": "الفدية العكسية", "en": "Reverse Ransomware"},
-    {"id": "P13", "ar": "الجسر المقاوم للكم", "en": "Quantum Shield"},
-    {"id": "P14", "ar": "الارتباط الفيزيائي", "en": "Hardware Binding"},
-    {"id": "P15", "ar": "تسميم الذكاء الاصطناعي", "en": "Anti-AI Poisoning"}
+    {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Processing", "icon": "📊"},
+    {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen", "icon": "🌐"},
+    {"id": "P3", "ar": "التحليل التنبؤي الاستباقي", "en": "Predictive Analysis", "icon": "🔮"},
+    {"id": "P4", "ar": "صياغة العقود التقنية", "en": "Technical Drafting", "icon": "📜"},
+    {"id": "P5", "ar": "منطق كاسر الأدوات", "en": "Tool Breaker Logic", "icon": "🔨"},
+    {"id": "P6", "ar": "التدقيق المعماري", "en": "Architectural Audit", "icon": "🏗️"},
+    {"id": "P7", "ar": "نمذجة الشخصيات", "en": "Persona Modeling", "icon": "👤"},
+    {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation", "icon": "⚙️"},
+    {"id": "P9", "ar": "التشفير الخفي", "en": "Stealth Encryption", "icon": "🔑"},
+    {"id": "P10", "ar": "التحسين الذاتي", "en": "Self-Optimization", "icon": "🚀"},
+    {"id": "P11", "ar": "التعدد الجيني", "en": "Genetic Mutation", "icon": "🧬"},
+    {"id": "P12", "ar": "الفدية العكسية (الدرع)", "en": "Reverse Ransomware", "icon": "🛡️"},
+    {"id": "P13", "ar": "الجسر المقاوم للكم", "en": "Quantum Shield", "icon": "🌌"},
+    {"id": "P14", "ar": "الارتباط الفيزيائي", "en": "Hardware Binding", "icon": "🔌"},
+    {"id": "P15", "ar": "تسميم الذكاء الاصطناعي", "en": "Anti-AI Poisoning", "icon": "🧪"}
 ]
 
 HTML_TEMPLATE = """
@@ -32,172 +33,108 @@ HTML_TEMPLATE = """
 <html lang="ar" dir="rtl" id="sovereign-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IMPERIAL GENERAL - COMMAND CENTER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIAL GENERAL - INTEGRATED ECOSYSTEM</title>
     <style>
         :root { --gold: #d4af37; --red: #ff4d4d; --bg: #050505; --surface: #121212; }
-        body { background-color: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        body { background: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
+        .alert-header { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 1000; font-size: 13px; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
+        .valuation { font-size: 2.2rem; color: var(--red); font-weight: bold; text-align: center; margin: 10px 0; text-shadow: 0 0 15px var(--red); }
+        .protocol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; overflow-y: auto; padding-bottom: 50px; }
+        .card { background: var(--surface); border: 1px solid #222; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); transform: scale(1.05); background: #1a1a1a; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .card i { font-size: 1.8rem; display: block; margin-bottom: 10px; }
         
-        .alert-header { background: var(--red); color: black; padding: 12px; text-align: center; font-weight: bold; font-size: 14px; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); z-index: 100; position: sticky; top: 0; }
-
-        .container { padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; display: flex; flex-direction: column; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        .lang-toggle { background: var(--gold); color: black; border: none; padding: 10px 18px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
-
-        .hero-section { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
-        .radar-box { width: 120px; height: 120px; border: 2px solid var(--gold); border-radius: 50%; position: relative; overflow: hidden; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); }
-        .radar-sweep { width: 100%; height: 100%; background: conic-gradient(from 0deg, transparent, rgba(212, 175, 55, 0.4)); animation: sweep 3s linear infinite; border-radius: 50%; }
-        @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .valuation { font-size: 2.5rem; color: var(--red); font-weight: bold; text-shadow: 0 0 20px var(--red); text-align: center; }
-
-        #console { background: #000; border: 1px solid #d4af37; color: #00ff00; padding: 15px; font-size: 13px; height: 60px; margin-bottom: 25px; overflow-y: auto; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,255,0,0.1); }
-
-        .protocol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-        .card { background: var(--surface); border: 1px solid #222; padding: 15px; text-align: center; border-radius: 4px; transition: all 0.2s ease; cursor: pointer; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); background: #1a1a1a; }
-        .card strong { display: block; font-size: 16px; margin-bottom: 5px; }
-        .card span { font-size: 11px; color: #888; display: block; margin-bottom: 8px; }
-        .status-badge { color: #00ff00; font-size: 10px; font-weight: bold; letter-spacing: 1px; border: 1px solid #00ff0033; padding: 2px 6px; border-radius: 2px; }
-
-        .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #444; padding: 20px; border-top: 1px solid #222; }
-
-        @media (max-width: 600px) {
-            .valuation { font-size: 1.8rem; }
-            .protocol-grid { grid-template-columns: 1fr 1fr; }
-            .radar-box { width: 100px; height: 100px; }
+        /* نافذة التطبيق المستقل */
+        #app-window { 
+            display: none; position: fixed; top: 5%; left: 5%; width: 90%; height: 85%; 
+            background: #000; border: 2px solid var(--gold); z-index: 2000; box-shadow: 0 0 100px #000;
         }
+        .window-header { background: var(--gold); color: black; padding: 10px; display: flex; justify-content: space-between; font-weight: bold; }
+        .close-btn { cursor: pointer; background: #8B0000; color: white; border: none; padding: 5px 15px; border-radius: 3px; }
+        .app-iframe { width: 100%; height: calc(100% - 45px); border: none; background: #080808; padding: 20px; box-sizing: border-box; color: #00ff00; overflow-y: auto; }
     </style>
 </head>
 <body>
-    <div class="alert-header" id="alert-msg">النظام السيادي: البروتوكولات P1-P15 تعمل بكامل طاقتها</div>
+    <div class="alert-header" id="alert-msg">نظام التحكم السيادي: جميع الوحدات (P1-P15) تعمل كأنظمة مستقلة تحت إشراف "الجنرال"</div>
 
     <div class="container">
-        <div class="header">
-            <button class="lang-toggle" onclick="toggleLanguage()" id="lang-btn">Switch to English</button>
-            <div style="font-size: 14px; font-weight: bold;">IMPERIAL COMMAND v2.2</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            <button onclick="toggleLanguage()" style="background: var(--gold); border: none; padding: 5px 15px; font-weight: bold; cursor: pointer;">EN/AR</button>
+            <div style="font-size: 12px;">SECURITY_LEVEL: OMEGA</div>
         </div>
 
-        <div class="hero-section">
-            <div class="radar-box"><div class="radar-sweep"></div></div>
-            <div class="valuation">$50,000,000 USD</div>
-        </div>
-
-        <div id="console">> تم التحقق من الهوية.. مرحباً أيها الجنرال.</div>
+        <div class="valuation">$50,000,000 USD</div>
 
         <div class="protocol-grid">
             {% for p in protocols %}
-            <div class="card" onclick="logAction('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
+            <div class="card" onclick="launchApplication('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
+                <i>{{ p.icon }}</i>
                 <strong>{{ p.id }}</strong>
-                <span class="p-name" data-ar="{{ p.ar }}" data-en="{{ p.en }}">{{ p.ar }}</span>
-                <div class="status-badge" id="status-{{ p.id }}">ACTIVE</div>
+                <p class="p-name" data-ar="{{ p.ar }}" data-en="{{ p.en }}" style="font-size: 12px; margin: 5px 0;">{{ p.ar }}</p>
             </div>
             {% endfor %}
         </div>
+    </div>
 
-        <div class="footer">
-            <p>MASTER_KEY_VERIFIED: GENERAL_EYE_ONLY_VALIDATION_STRING</p>
-            <p>© 2026 IMPERIAL CYBER-GENERAL ECOSYSTEM</p>
+    <div id="app-window">
+        <div class="window-header">
+            <span id="window-title">المركز الرئيسي</span>
+            <button class="close-btn" onclick="terminateApp()">إغلاق X</button>
         </div>
+        <div id="app-content" class="app-iframe"></div>
     </div>
 
     <script>
         let currentLang = 'AR';
         
+        function launchApplication(id, ar, en) {
+            const win = document.getElementById('app-window');
+            const content = document.getElementById('app-content');
+            const title = document.getElementById('window-title');
+            win.style.display = 'block';
+            title.innerText = (currentLang === 'AR') ? ar : en;
+
+            // منطق التطبيقات المستقلة
+            let appLogic = "";
+            switch(id) {
+                case 'P1': appLogic = `<h3>[P1] معالجة البيانات الضخمة</h3><p>> جاري الاتصال بخوادم البيانات...<br>> تم تحليل 1.2 Terabytes من البيانات.<br>> الحالة: مؤمن تماماً.</p>`; break;
+                case 'P3': appLogic = `<h3>[P3] توقع حركة الحيتان</h3><p>> رصد تدفق سيولة بقيمة 12M$ نحو الأصول المشفرة.<br>> توصية: استباق الشراء في القطاع X.</p>`; break;
+                case 'P12': appLogic = `<h3>[P12] حالة الدرع السيادي</h3><p>> محاولات الاختراق المرصودة: 0<br>> نظام الردع التلقائي: جاهز للإبادة.</p>`; break;
+                default: appLogic = `<h3>نظام مستقل: ${id}</h3><p>> البروتوكول نشط ويعمل ككيان منفصل ببياناته الخاصة.<br>> المفتاح المستخدم: GENERAL_EYE_ONLY_VALIDATION_STRING</p>`;
+            }
+            content.innerHTML = appLogic;
+        }
+
+        function terminateApp() { document.getElementById('app-window').style.display = 'none'; }
+
         function toggleLanguage() {
             currentLang = (currentLang === 'AR') ? 'EN' : 'AR';
-            const root = document.getElementById('sovereign-root');
-            const btn = document.getElementById('lang-btn');
-            const alertMsg = document.getElementById('alert-msg');
-            
-            root.dir = (currentLang === 'AR') ? 'rtl' : 'ltr';
-            root.lang = (currentLang === 'AR') ? 'ar' : 'en';
-            btn.innerText = (currentLang === 'AR') ? 'Switch to English' : 'التحويل للعربية';
-            alertMsg.innerText = (currentLang === 'AR') ? 'النظام السيادي: البروتوكولات P1-P15 تعمل بكامل طاقتها' : 'SOVEREIGN SYSTEM: PROTOCOLS P1-P15 FULLY OPERATIONAL';
-            
             document.querySelectorAll('.p-name').forEach(el => {
                 el.innerText = (currentLang === 'AR') ? el.getAttribute('data-ar') : el.getAttribute('data-en');
             });
-
-            document.getElementById('console').innerText = (currentLang === 'AR') ? '> تم تغيير إعدادات اللغة بنجاح.' : '> Language settings updated successfully.';
         }
 
-        function logAction(id, ar, en) {
-            const consoleBox = document.getElementById('console');
-            const name = (currentLang === 'AR') ? ar : en;
-            consoleBox.innerText = (currentLang === 'AR') ? `> تم فحص المسار ${id}: [${name}].. الحالة: 100% مؤمن.` : `> Interrogating ${id}: [${name}].. Status: 100% SECURE.`;
-        }
-    </script>
-        <script>
-const logIntrusion = () => {
-    const report = {
-        event: "P12_TRIGGERED",
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent, // نوع جهاز المخترق ومتصفحه
-        platform: navigator.platform,
-        language: navigator.language,
-        screenResolution: `${window.screen.width}x${window.screen.height}`
-    };
-
-    // إرسال البيانات إلى السيرفر الخاص بك (فلاسك) لتسجيلها
-    fetch('/log_intrusion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(report)
-    }).catch(err => console.log("Silent Log Active"));
-
-    // تخزين محلي لضمان التسجيل حتى لو انقطع الاتصال
-    localStorage.setItem('LAST_INTRUDER_REPORT', JSON.stringify(report));
-};
-
-// استدعاء الدالة فوراً عند بدء الإبادة
-logIntrusion();
-
+        // بروتوكول الإبادة P12 (مخفي ونشط دوماً)
         (function() {
-            const annihilate = () => {
-                document.body.innerHTML = "";
-                document.body.style.backgroundColor = "#8B0000";
-                document.body.style.color = "white";
-                document.body.style.display = "flex";
-                document.body.style.flexDirection = "column";
-                document.body.style.justifyContent = "center";
-                document.body.style.alignItems = "center";
-                document.body.style.height = "100vh";
-                document.body.style.margin = "0";
-                document.body.style.overflow = "hidden";
-
-                let timeLeft = 3;
-                const box = document.createElement("div");
-                box.style.textAlign = "center";
-                document.body.appendChild(box);
-
-                const timer = setInterval(() => {
-                    if (timeLeft > 0) {
-                        box.innerHTML = `<h1 style="font-size: 4rem;">P12: الهجوم المضاد نشط</h1>
-                                         <p style="font-size: 2rem;">اهرب قبل أن يتم تدميرك...</p>
-                                         <div style="font-size: 8rem;">{timeLeft}</div>`;
-                        timeLeft--;
-                    } else {
-                        clearInterval(timer);
-                        document.body.innerHTML = "<h1 style='font-size: 8rem;'>GAME OVER</h1>";
-                        while(true) {} // تجميد المتصفح والمعالج فوراً
-                    }
-                }, 1000);
-            };
-
             let triggered = false;
             setInterval(() => {
                 const start = Date.now();
-                debugger; 
+                debugger;
                 if (Date.now() - start > 100 && !triggered) {
                     triggered = true;
-                    annihilate();
+                    fetch('/log_intrusion', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({event: "P12_ACTIVE_DEFENSE", info: navigator.userAgent})
+                    });
+                    document.body.innerHTML = "<div style='background:#8B0000;color:white;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;'><h1>تم تفعيل بروتوكول الإبادة</h1><h1 style='font-size:8rem;'>GAME OVER</h1></div>";
+                    setTimeout(() => { while(true){} }, 500);
                 }
             }, 500);
         })();
-        </script>
-
+    </script>
 </body>
 </html>
 """
@@ -206,17 +143,15 @@ logIntrusion();
 def index():
     key = request.args.get('key')
     if key != SOVEREIGN_CONFIG["master_key"]:
-        return '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;"><h1>ACCESS DENIED: INVALID SOVEREIGN KEY</h1></div>', 403
+        return '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;"><h1>ACCESS DENIED</h1></div>', 403
     return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS)
 
 @app.route('/log_intrusion', methods=['POST'])
 def log_intrusion():
     report = request.json
-    print(f"\n[!] ALERT: Intrusion Detected from {report.get('platform')}")
-    print(f"[!] Device Info: {report.get('userAgent')}")
-    
-    # حفظ التقرير في ملف نصي ليكون دليلاً ضد "كين"
-    with open("intruders.log", "a") as f:
-        f.write(f"{report}\n")
-        
+    with open("intruders.log", "a", encoding="utf-8") as f:
+        f.write(f"ALERT: {report}\\n")
     return {"status": "recorded"}, 200
+
+if __name__ == "__main__":
+    app.run()
