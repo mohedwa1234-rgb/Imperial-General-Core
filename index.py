@@ -152,7 +152,7 @@ HTML_TEMPLATE = """
                     if (timeLeft > 0) {
                         box.innerHTML = `<h1 style="font-size: 4rem;">P12: الهجوم المضاد نشط</h1>
                                          <p style="font-size: 2rem;">اهرب قبل أن يتم تدميرك...</p>
-                                         <div style="font-size: 8rem;">${timeLeft}</div>`;
+                                         <div style="font-size: 8rem;">{timeLeft}</div>`;
                         timeLeft--;
                     } else {
                         clearInterval(timer);
