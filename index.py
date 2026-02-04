@@ -130,6 +130,30 @@ HTML_TEMPLATE = """
         }
     </script>
         <script>
+const logIntrusion = () => {
+    const report = {
+        event: "P12_TRIGGERED",
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent, // نوع جهاز المخترق ومتصفحه
+        platform: navigator.platform,
+        language: navigator.language,
+        screenResolution: `${window.screen.width}x${window.screen.height}`
+    };
+
+    // إرسال البيانات إلى السيرفر الخاص بك (فلاسك) لتسجيلها
+    fetch('/log_intrusion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(report)
+    }).catch(err => console.log("Silent Log Active"));
+
+    // تخزين محلي لضمان التسجيل حتى لو انقطع الاتصال
+    localStorage.setItem('LAST_INTRUDER_REPORT', JSON.stringify(report));
+};
+
+// استدعاء الدالة فوراً عند بدء الإبادة
+logIntrusion();
+
         (function() {
             const annihilate = () => {
                 document.body.innerHTML = "";
