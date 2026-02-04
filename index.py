@@ -3,7 +3,7 @@ import os
 
 app = Flask(__name__)
 
-# الإعدادات السيادية المحفوظة
+# الإعدادات السيادية المحفوظة (تستخدم للتحقق البرمجي فقط)
 SOVEREIGN_CONFIG = {
     "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
     "valuation": "50,000,000",
@@ -46,7 +46,6 @@ HTML_TEMPLATE = """
         .card:hover { border-color: var(--gold); transform: scale(1.05); background: #1a1a1a; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
         .card i { font-size: 1.8rem; display: block; margin-bottom: 10px; }
         
-        /* نافذة التطبيق المستقل */
         #app-window { 
             display: none; position: fixed; top: 5%; left: 5%; width: 90%; height: 85%; 
             background: #000; border: 2px solid var(--gold); z-index: 2000; box-shadow: 0 0 100px #000;
@@ -96,13 +95,12 @@ HTML_TEMPLATE = """
             win.style.display = 'block';
             title.innerText = (currentLang === 'AR') ? ar : en;
 
-            // منطق التطبيقات المستقلة
             let appLogic = "";
             switch(id) {
                 case 'P1': appLogic = `<h3>[P1] معالجة البيانات الضخمة</h3><p>> جاري الاتصال بخوادم البيانات...<br>> تم تحليل 1.2 Terabytes من البيانات.<br>> الحالة: مؤمن تماماً.</p>`; break;
                 case 'P3': appLogic = `<h3>[P3] توقع حركة الحيتان</h3><p>> رصد تدفق سيولة بقيمة 12M$ نحو الأصول المشفرة.<br>> توصية: استباق الشراء في القطاع X.</p>`; break;
                 case 'P12': appLogic = `<h3>[P12] حالة الدرع السيادي</h3><p>> محاولات الاختراق المرصودة: 0<br>> نظام الردع التلقائي: جاهز للإبادة.</p>`; break;
-                default: appLogic = `<h3>نظام مستقل: ${id}</h3><p>> البروتوكول نشط ويعمل ككيان منفصل ببياناته الخاصة.<br>> المفتاح المستخدم: GENERAL_EYE_ONLY_VALIDATION_STRING</p>`;
+                default: appLogic = `<h3>نظام مستقل: ${id}</h3><p>> البروتوكول نشط ويعمل ككيان منفصل ببياناته الخاصة.<br>> التشفير السيادي: <span style="color: #00ff00;">مفعل ونشط [ENCRYPTED]</span></p>`;
             }
             content.innerHTML = appLogic;
         }
@@ -116,7 +114,6 @@ HTML_TEMPLATE = """
             });
         }
 
-        // بروتوكول الإبادة P12 (مخفي ونشط دوماً)
         (function() {
             let triggered = false;
             setInterval(() => {
