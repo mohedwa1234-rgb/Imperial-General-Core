@@ -40,6 +40,17 @@
 
         async function executeProtocol(pCode) {
             if (isProcessing) return; // منع التداخل والانهيار
+try {
+    const response = await fetch('/api/general?p_code=' + pCode);
+    const data = await response.json();
+    
+    // إرسال البيانات إلى شاشة الرادار
+    const log = document.getElementById('radar-logs');
+    log.innerHTML = `<div>[${new Date().toLocaleTimeString()}] > ${data.title}: ${data.data}</div>` + log.innerHTML;
+} catch (e) {
+    console.error("اتصال مقطوع");
+}
+
             
             isProcessing = true;
             document.getElementById('status-display').innerText = `EXECUTING ${pCode}...`;
