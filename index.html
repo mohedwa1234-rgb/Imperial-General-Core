@@ -55,7 +55,19 @@ try {
             isProcessing = true;
             document.getElementById('status-display').innerText = `EXECUTING ${pCode}...`;
             
-            try {
+            try {                // 1. طلب البيانات من السيرفر
+                const response = await fetch('/api/general?p_code=' + pCode);
+                const data = await response.json();
+                
+                // 2. تحديث الرادار بالنتيجة
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `[${new Date().toLocaleTimeString()}] > ${data.title}: ${data.data}`;
+                LOGS.prepend(entry);
+                
+                // 3. الحفاظ على نظافة الشاشة (آخر 10 سجلات)
+                if (LOGS.childNodes.length > 10) LOGS.removeChild(LOGS.lastChild);
+
                 // الاتصال بـ API الجنرال
                 const response = await fetch(`/api?p_code=${pCode}`);
                 const data = await response.json();
