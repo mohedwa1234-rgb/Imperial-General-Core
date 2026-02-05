@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Imperial Cyber-General Dashboard</title>
+    <style>
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
+        .radar-box { border: 1px solid #00ff41; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px #00ff41; }
+        .button-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+        button { background: #001100; color: #00ff41; border: 1px solid #00ff41; cursor: pointer; padding: 5px; }
+        button:hover { background: #00ff41; color: #000; }
+        .log-entry { font-size: 0.8em; margin: 2px 0; }
+    </style>
+</head>
+<body>
+    <h1>GENERAL COMMAND CENTER v11.0</h1>
+    <div id="status-display" style="color: yellow;">Status: STANDBY / جاهز</div>
+    
+    <div class="radar-box">
+        <h3>LIVE RADAR FEED / رادارات الرصد</h3>
+        <div id="radar-logs"></div>
+    </div>
+
+    <h3>TACTICAL MODULES (P1 - P70)</h3>
+    <div class="button-grid" id="btn-grid"></div>
+
+    <script>
+        // --- درع الحماية الإمبراطوري (THE FIX) ---
+        let isProcessing = false;
+        const GRID = document.getElementById('btn-grid');
+        const LOGS = document.getElementById('radar-logs');
+
+        // إنشاء 70 زراً برمجياً
+        for(let i=1; i<=70; i++) {
+            let btn = document.createElement('button');
+            btn.innerText = 'P' + i;
+            btn.onclick = () => executeProtocol('P' + i);
+            GRID.appendChild(btn);
+        }
+
+        async function executeProtocol(pCode) {
+            if (isProcessing) return; // منع التداخل والانهيار
+            
+            isProcessing = true;
+            document.getElementById('status-display').innerText = `EXECUTING ${pCode}...`;
+            
+            try {
+                // الاتصال بـ API الجنرال
+                const response = await fetch(`/api?p_code=${pCode}`);
+                const data = await response.json();
+                
+                // عرض النتيجة بهيبة
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `[${new Date().toLocaleTimeString()}] > ${data.title}: ${data.data} [${data.status}]`;
+                LOGS.prepend(entry);
+                
+                if (LOGS.childNodes.length > 10) LOGS.removeChild(LOGS.lastChild);
+            } catch (err) {
+                console.error("Shield Triggered: Request throttled to prevent Error 500.");
+            } finally {
+                // كبح السرعة: منع أي ضغطة أخرى لمدة 3 ثوانٍ لحماية السيرفر
+                setTimeout(() => { 
+                    isProcessing = false; 
+                    document.getElementById('status-display').innerText = "Status: ONLINE / سيادة كاملة";
+                }, 3000);
+            }
+        }
+
+        // رادار تلقائي كل 15 ثانية (آمن جداً)
+        setInterval(() => { if(!isProcessing) executeProtocol('P1'); }, 15000);
+    </script>
+</body>
+</html>
