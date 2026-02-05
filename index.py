@@ -128,18 +128,21 @@ HTML_TEMPLATE = """
         
         stream.innerHTML = `> Initializing ${id}...<br>> Connection Secured.<br>> Fetching Imperial Data...<br>`;
         
-        window.activeInt = setInterval(() => {
-            const lines = [
-                `> [DATA] New Block Decrypted: ${Math.random().toString(16).slice(2,10)}`,
-                `> [SEC] Audit Pass: Sovereign Logic Verified.`,
-                `> [WHALE] Movement Detected: $12.4M USD -> Target Alpha.`,
-                `> [SYSTEM] Self-Optimization in progress...`
-            ];
-            const div = document.createElement('div');
-            div.innerHTML = lines[Math.floor(Math.random() * lines.length)];
-            stream.prepend(div);
-            if(stream.childNodes.length > 25) stream.removeChild(stream.lastChild);
-        }, 500);
+
+    window.activeInt = setInterval(async () => {
+    const response = await fetch('/api/whale_stream');
+    const realData = await response.json();
+    const stream = document.getElementById('stream-content');
+    
+    realData.forEach(line => {
+        const div = document.createElement('div');
+        div.style.color = "#00ff41"; // اللون الأخضر للبيانات الحقيقية
+        div.innerText = line;
+        stream.prepend(div);
+        if(stream.childNodes.length > 20) stream.removeChild(stream.lastChild);
+    });
+}, 5000); // تحديث حي كل 5 ثوانٍ
+        
     }
 
     function terminate() {
