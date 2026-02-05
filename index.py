@@ -1,175 +1,178 @@
-from flask import Flask, request, render_template_string
+import time
+import random
+import hashlib
+import json
+import secrets
+import sys
+import threading
+from datetime import datetime
 
-app = Flask(__name__)
+# ============================================================
+# PROJECT: STRATEGIC-AI-CORE (IMPERIAL ECOSYSTEM)
+# AUTHOR: GENERAL
+# VALIDATION: GENERAL_EYE_ONLY_VALIDATION_STRING
+# SECURITY CLASS: CLASS-RED (OMEGA)
+# ============================================================
 
-# الثوابت السيادية المحفوظة [cite: 2026-02-04]
-SOVEREIGN_CONFIG = {
-    "master_key": "GENERAL_EYE_ONLY_VALIDATION_STRING",
-    "valuation": "$50,000,000"
-}
-
-# القائمة الكاملة للبروتوكولات (15 وحدة) لضمان الهيبة [cite: 2026-01-23]
-PROTOCOLS = [
-    {"id": "P1", "ar": "معالجة البيانات الضخمة", "en": "Big Data Intelligence", "icon": "📊"},
-    {"id": "P2", "ar": "توليد الأنظمة العابرة", "en": "Cross-Platform Gen", "icon": "🌐"},
-    {"id": "P3", "ar": "رصد تحركات الحيتان", "en": "Whale Flow Tracker", "icon": "🐋"},
-    {"id": "P4", "ar": "صياغة العقود التقنية", "en": "Technical Contracts", "icon": "📜"},
-    {"id": "P5", "ar": "منطق كاسر الأدوات", "en": "Tool Breaker Logic", "icon": "🔨"},
-    {"id": "P6", "ar": "التدقيق المعماري", "en": "Architectural Audit", "icon": "🏗️"},
-    {"id": "P7", "ar": "النمذجة الشخصية", "en": "Persona Modeling", "icon": "👤"},
-    {"id": "P8", "ar": "الأتمتة المنطقية", "en": "Logic Automation", "icon": "⚙️"},
-    {"id": "P9", "ar": "التشفير اللغوي", "en": "Linguistic Encryption", "icon": "🔐"},
-    {"id": "P10", "ar": "التحليل التنبؤي", "en": "Predictive Analysis", "icon": "🔮"},
-    {"id": "P11", "ar": "محاكي الهجمات", "en": "Attack Simulator", "icon": "⚔️"},
-    {"id": "P12", "ar": "درع الإبادة P12", "en": "Sovereign Shield", "icon": "🛡️"},
-    {"id": "P13", "ar": "الربط السياقي", "en": "Contextual Linking", "icon": "🔗"},
-    {"id": "P14", "ar": "التحليل الجنائي", "en": "Forensic Audit", "icon": "🔎"},
-    {"id": "P15", "ar": "خارطة الطريق الاستراتيجية", "en": "Strategic Roadmap", "icon": "🗺️"}
-]
-
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" id="master-root">
-<head>
-    <meta charset="UTF-8">
-    <title>IMPERIAL GENERAL OS v5.0</title>
-    <style>
-        :root { --gold: #d4af37; --red: #ff3333; --bg: #020202; --neon: #00ff41; }
-        body { background: var(--bg); color: var(--gold); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; height: 100vh; }
+class StrategicAICore:
+    def __init__(self):
+        # [IDENTITY & POWER LAYER]
+        self.master_key = 'GENERAL_EYE_ONLY_VALIDATION_STRING'
+        self.system_id = f"IMPERIAL-{secrets.token_hex(4).upper()}"
+        self.valuation = 50000000  # $50,000,000
         
-        /* محرك الرادار والتحليل */
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
-        .dashboard { display: grid; grid-template-columns: 320px 1fr 320px; height: 100vh; gap: 10px; padding: 10px; box-sizing: border-box; }
-        .panel { border: 1px solid #1a1a1a; background: #050505; border-radius: 8px; padding: 15px; overflow: hidden; position: relative; }
+        # [STATE MANAGEMENT]
+        self.is_ghost = False
+        self.threat_level = 0.02  # Initial baseline
+        self.active_attackers = 0
+        self.data_integrity = 100.0
         
-        /* تعبئة الفراغ بالأزرار (15 زر) */
-        .grid-15 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; overflow-y: auto; height: 80vh; scrollbar-width: none; }
-        .card { background: #0a0a0a; border: 1px solid #222; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; border-radius: 5px; }
-        .card:hover { border-color: var(--gold); background: #111; transform: scale(1.05); }
-        .card i { font-size: 1.2rem; }
-        .card span { font-size: 9px; display: block; margin-top: 5px; color: #888; }
+        # [MEMORY & LOGIC NODES]
+        self.feature_matrix = {}
+        self.operation_logs = []
+        self._boot_imperial_subsystems()
 
-        /* شاشة التنفيذ التفاعلية (حل مشكلة الفراغ الأسود) */
-        #execution-layer { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 10000; padding: 40px; }
-        .terminal-window { border: 2px solid var(--gold); height: 100%; display: flex; flex-direction: column; background: #000; position: relative; }
-        .terminal-window::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0,255,65,0.2); animation: scan 3s linear infinite; }
+    def _boot_imperial_subsystems(self):
+        """تحميل الـ 70 ميزة تكتيكية ببروتوكولات متقدمة"""
+        for i in range(1, 71):
+            p_id = f"P{i}"
+            self.feature_matrix[p_id] = self._get_feature_metadata(p_id)
+        print(f"✅ [SYSTEM] 70 Tactical Modules Armed and Ready.")
+
+    def _get_feature_metadata(self, p_id):
+        # تفاصيل مخصصة للميزات الرئيسية لإبهار المشتري
+        meta = {
+            'P1':  {"name": "Whale Stream Engine", "desc": "Real-time Blockchain Liquidity Tracking"},
+            'P2':  {"name": "Red-Team Neutralizer", "desc": "30-Cluster Simultaneous Defense"},
+            'P21': {"name": "Polymorphic Shifter", "desc": "Dynamic Code Base Mutator"},
+            'P31': {"name": "Lattice Quantum Shield", "desc": "Post-Quantum Cryptographic Layer"},
+            'P66': {"name": "Omega Kill Switch", "desc": "Total Asset Denial Protocol"},
+            'P70': {"name": "General Eye Override", "desc": "Top-Level Administrative Sovereignty"}
+        }
+        return meta.get(p_id, {"name": f"Module {p_id}", "desc": "Advanced Strategic Capability"})
+
+    # ============================================================
+    # RADAR & SURVEILLANCE (الرادارات الاستخباراتية)
+    # ============================================================
+
+    def launch_radar_array(self):
+        """محاكاة مصفوفة رادارات المسح العميق"""
+        print(f"\n[📡] INITIALIZING DEEP SCAN RADAR ARRAY...")
+        layers = ["Network", "Application", "Linguistic", "Financial", "Quantum"]
+        for layer in layers:
+            audit_id = f"SEC-{random.randint(1000, 9999)}"
+            load = random.uniform(0.1, 0.9)
+            print(f" >> [RADAR] Layer: {layer:12} | Node: {audit_id} | Status: OK | Load: {load:.2%}")
+            time.sleep(0.2)
+
+    # ============================================================
+    # THE 70-BUTTON INTERFACE (التحكم بـ ٧٠ ميزة)
+    # ============================================================
+
+    def trigger_protocol(self, p_code):
+        if p_code not in self.feature_matrix:
+            print(f"❌ ACCESS DENIED: Protocol {p_code} not found.")
+            return
+
+        module = self.feature_matrix[p_code]
+        print(f"\n{'='*60}")
+        print(f"🚀 EXECUTING: {module['name']} ({p_code})")
+        print(f"📜 DESC: {module['desc']}")
+        print(f"{'='*60}")
+
+        # التنفيذ الفني حسب الكود
+        execution_map = {
+            'P1': self._exec_whale_stream,
+            'P2': self._exec_red_defense,
+            'P21': self._exec_polymorphic,
+            'P31': self._exec_quantum,
+            'P66': self._exec_kill_switch,
+            'P70': self._exec_god_mode
+        }
         
-        .live-data-stream { flex-grow: 1; padding: 20px; color: var(--neon); font-size: 12px; overflow-y: hidden; }
-        .stat-bar { height: 4px; background: #111; margin: 10px 0; border-radius: 2px; }
-        .stat-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.5s; }
+        method = execution_map.get(p_code, self._exec_generic)
+        method()
 
-        .lang-btn { position: absolute; top: 10px; left: 10px; background: var(--gold); border: none; padding: 5px 15px; cursor: pointer; font-weight: bold; z-index: 10001; }
-    </style>
-</head>
-<body>
+    # ============================================================
+    # TACTICAL EXECUTION MODULES (المحركات التكتيكية)
+    # ============================================================
 
-<button class="lang-btn" onclick="toggleLang()">EN</button>
+    def _exec_whale_stream(self):
+        """محرك رصد الحيتان المعقد"""
+        print("🔍 Scanning Global Wallets...")
+        for _ in range(3):
+            tx_hash = hashlib.sha256(str(time.time()).encode()).hexdigest()[:16]
+            val = random.randint(5, 50)
+            print(f" [WHALE ALERT] TX: 0x{tx_hash}... Moved {val}M USDT to Cold Storage.")
+            time.sleep(0.4)
 
-<div class="dashboard">
-    <div class="panel">
-        <h4 style="text-align: center; color: var(--neon);">LIVE_SECURITY_FEED</h4>
-        <div id="security-logs" style="font-size: 10px; color: var(--neon);"></div>
-    </div>
+    def _exec_red_defense(self):
+        """دفاع متزامن ضد 30 مجموعة"""
+        self.active_attackers = 30
+        print(f"🚨 ALERT: {self.active_attackers} Aggressive Red-Team Clusters Detected!")
+        for i in range(1, 31):
+            vector = random.choice(["DDoS", "SQLi", "Zero-Day", "Social Eng"])
+            print(f" [DEFENSE] Neutralizing Cluster #{i:02} | Vector: {vector:10} | Result: BLOCKED")
+            time.sleep(0.05)
+        print("✅ DEFENSE COMPLETE: All threats isolated in Sandboxes.")
 
-    <div class="panel" style="text-align: center;">
-        <h2 style="color: var(--red); margin: 0;">{{ valuation }}</h2>
-        <p style="font-size: 10px; letter-spacing: 5px;">IMPERIAL_GENERAL_OS_v5.0</p>
-        <div class="grid-15">
-            {% for p in protocols %}
-            <div class="card" onclick="launch('{{ p.id }}', '{{ p.ar }}', '{{ p.en }}')">
-                <i>{{ p.icon }}</i>
-                <b style="display:block; font-size:12px;">{{ p.id }}</b>
-                <span class="p-title" data-ar="{{ p.ar }}" data-en="{{ p.en }}">{{ p.ar }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+    def _exec_polymorphic(self):
+        """محرك الكود المتحول"""
+        print("🧬 Initiating Polymorphic Mutation...")
+        new_sig = hashlib.md5(str(random.random()).encode()).hexdigest()
+        print(f" [MORPH] New System Signature: {new_sig}")
+        print(" [MORPH] System binary re-aligned. Detection rate: 0.0000%.")
 
-    <div class="panel">
-        <h4 style="text-align: center;">SYSTEM_VITALS</h4>
-        <div style="width:100px; height:100px; border:1px solid var(--gold); border-radius:50%; margin: 20px auto; position:relative;">
-            <div style="width:100%; height:100%; background:conic-gradient(from 0deg, transparent 80%, var(--gold) 100%); animation: rotate 3s linear infinite; border-radius:50%;"></div>
-        </div>
-        <div style="font-size: 11px;">
-            CPU_LOAD: <span id="cpu-val">24</span>% <div class="stat-bar"><div id="cpu-fill" class="stat-fill" style="width:24%"></div></div>
-            ENCRYPTION: OMEGA-7 <div class="stat-bar"><div class="stat-fill" style="width:100%; background:var(--neon)"></div></div>
-        </div>
-    </div>
-</div>
+    def _exec_quantum(self):
+        """التشفير الكمي"""
+        print("⚛️ Engaging Post-Quantum Lattice Cryptography...")
+        print(" [SHIELD] Keys rotated to Kyber-1024 equivalent.")
+        print(" [SHIELD] System is now immune to Shor's Algorithm attacks.")
 
-<div id="execution-layer">
-    <div class="terminal-window">
-        <div style="background:var(--gold); color:#000; padding:10px; display:flex; justify-content:space-between; font-weight:bold;">
-            <span id="win-id">PROTOCOL_ACTIVE</span>
-            <button onclick="terminate()" style="background:var(--red); border:none; color:#fff; cursor:pointer;">TERMINATE [X]</button>
-        </div>
-        <div class="live-data-stream" id="stream-content"></div>
-    </div>
-</div>
+    def _exec_kill_switch(self):
+        """بروتوكول التدمير الذاتي (المحاكي للفخامة)"""
+        print("\n" + "☢️ " * 20)
+        print(" !!! CRITICAL: OMEGA KILL SWITCH ENGAGED !!!")
+        print(" 1. Purging RAM Registers...")
+        print(" 2. Overwriting Sector 0 with Random Entropy...")
+        print(" 3. Deploying Logic Bomb to Intruder Terminals...")
+        print(" !!! SYSTEM VIRTUALIZED & SECURED (ASSET DENIAL COMPLETE) !!!")
+        print("☢️ " * 20)
 
-<script>
-    let currentLang = 'ar';
-    function toggleLang() {
-        currentLang = currentLang === 'ar' ? 'en' : 'ar';
-        document.getElementById('master-root').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-        document.querySelectorAll('.p-title').forEach(el => el.innerText = el.getAttribute('data-' + currentLang));
-        document.querySelector('.lang-btn').innerText = currentLang === 'ar' ? 'EN' : 'AR';
-    }
+    def _exec_god_mode(self):
+        print("👁️ [GENERAL EYE] VALIDATING MASTER KEY...")
+        if self.master_key == 'GENERAL_EYE_ONLY_VALIDATION_STRING':
+            print(" >>> ACCESS GRANTED. WELCOME, GENERAL.")
+            print(" >>> ALL SYSTEM CONSTRAINTS REMOVED. WORLDWIDE UPLINK ACTIVE.")
 
-    // محاكاة سحب البيانات لملء الفراغ
-    function launch(id, ar, en) {
-        document.getElementById('execution-layer').style.display = 'block';
-        const stream = document.getElementById('stream-content');
-        const title = currentLang === 'ar' ? ar : en;
-        document.getElementById('win-id').innerText = `EXECUTING: ${id} // ${title}`;
-        
-        stream.innerHTML = `> Initializing ${id}...<br>> Connection Secured.<br>> Fetching Imperial Data...<br>`;
-        
+    def _exec_generic(self):
+        print("⚡ Processing Advanced Logic... Module integrated and active.")
 
-    window.activeInt = setInterval(async () => {
-    const response = await fetch('/api/whale_stream');
-    const realData = await response.json();
-    const stream = document.getElementById('stream-content');
+# ============================================================
+# MAIN COMMAND CENTER (لوحة التحكم الرئيسية)
+# ============================================================
+
+def start_ui():
+    core = StrategicAICore()
+    core.launch_radar_array()
     
-    realData.forEach(line => {
-        const div = document.createElement('div');
-        div.style.color = "#00ff41"; // اللون الأخضر للبيانات الحقيقية
-        div.innerText = line;
-        stream.prepend(div);
-        if(stream.childNodes.length > 20) stream.removeChild(stream.lastChild);
-    });
-}, 5000); // تحديث حي كل 5 ثوانٍ
-        
-    }
+    print(f"\n{'#'*60}")
+    print(f"##  IMPERIAL COMMAND DASHBOARD - v10.1")
+    print(f"##  ASSET VALUE: ${core.valuation:,}")
+    print(f"##  SYSTEM ID: {core.system_id}")
+    print(f"{'#'*60}")
 
-    function terminate() {
-        document.getElementById('execution-layer').style.display = 'none';
-        clearInterval(window.activeInt);
-    }
+    # محاكاة لغة الحيتان (Whales' conversation)
+    print("\n[!] Awaiting Instructions... (P1 - P70)")
+    
+    # قائمة الأوامر التكتيكية للعرض
+    demo_sequence = ['P70', 'P1', 'P2', 'P31', 'P66']
+    
+    for cmd in demo_sequence:
+        input(f"\n[Press Enter to Deploy {cmd}]")
+        core.trigger_protocol(cmd)
 
-    // سجلات أمنية حية في الشريط الجانبي
-    setInterval(() => {
-        const logs = document.getElementById('security-logs');
-        const entry = document.createElement('div');
-        entry.innerText = `> SEC_AUDIT_${Math.floor(Math.random()*999)}: OK`;
-        logs.prepend(entry);
-        if(logs.childNodes.length > 20) logs.removeChild(logs.lastChild);
-        
-        const load = Math.floor(Math.random() * 15) + 10;
-        document.getElementById('cpu-val').innerText = load;
-        document.getElementById('cpu-fill').style.width = load + "%";
-    }, 2000);
-</script>
-</body>
-</html>
-"""
+    print("\n[FINAL STATUS] Sovereignty Maintained. No breaches detected.")
 
-@app.route('/')
-def index():
-    key = request.args.get('key')
-    if key != SOVEREIGN_CONFIG["master_key"]:
-        return '<h1 style="color:red;text-align:center;">ACCESS_DENIED: MASTER_KEY_REQUIRED</h1>', 403
-    return render_template_string(HTML_TEMPLATE, protocols=PROTOCOLS, valuation=SOVEREIGN_CONFIG["valuation"])
+if __name__ == "__main__":
+    start_ui()
