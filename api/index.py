@@ -168,7 +168,6 @@ def api_logic():
         return jsonify({"msg": f"Unit {code}: Cross-Platform Synchronization - Logic Automation ACTIVE."})
     
     return jsonify({"msg": f"Module {code} operational."})
-
  Vercel:
 app = app
 
