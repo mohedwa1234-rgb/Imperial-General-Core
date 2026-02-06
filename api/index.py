@@ -1,233 +1,145 @@
 from flask import Flask, render_template_string, request, jsonify
 import random
-import datetime
 
 app = Flask(__name__)
 
 # ==========================================
 # CONFIGURATION & SECURITY
 # ==========================================
-MASTER_KEY = 'GENERAL_EYE_ONLY_VALIDATION_STRING'
+# مفتاح التحقق السيادي
+MASTER_KEY = 'GENERAL_EYE_ONLY_VALIDATION_STRING' [cite: 2026-02-04]
 
 # ==========================================
-# IMPERIAL FRONTEND (HTML/CSS/JS)
+# IMPERIAL FRONTEND (ALL-IN-ONE)
 # ==========================================
 HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIAL GENERAL | SOVEREIGNTY</title>
+    <title>IMPERIAL GENERAL | GLOBAL COMMAND</title>
     <style>
-        :root {
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.1);
-            --bg: #050505;
-            --glass: rgba(10, 10, 10, 0.9);
-        }
+        :root { --gold: #d4af37; --bg: #050505; --green: #00ff41; }
         * { box-sizing: border-box; }
         body { 
-            background: var(--bg); 
-            color: #fff; 
-            font-family: 'Segoe UI', serif; 
-            margin: 0; 
-            padding: 10px;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
+            background: var(--bg); color: #fff; font-family: 'Segoe UI', serif; 
+            margin: 0; padding: 10px; overflow-x: hidden;
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 90%);
         }
-
-        /* HEADER SECTION */
-        .imperial-header {
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .main-title {
-            color: var(--gold);
-            letter-spacing: 3px;
-            font-size: 1.5rem;
-            margin: 0;
-            text-transform: uppercase;
-        }
-        .valuation {
-            font-family: 'Courier New', monospace;
-            font-size: 1.2rem;
-            color: #fff;
-            background: var(--gold-dim);
-            border: 1px solid var(--gold);
-            padding: 5px 10px;
-            margin-top: 10px;
-            display: inline-block;
-        }
-        .status-line {
-            color: #00ff41;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            letter-spacing: 1px;
-        }
-
-        /* MAIN LAYOUT */
-        .dashboard-grid {
-            display: flex;
-            flex-direction: column; /* Mobile First */
-            gap: 15px;
-        }
+        .header { border-bottom: 2px solid var(--gold); padding: 20px; text-align: center; }
+        .valuation { color: var(--gold); font-size: 1.8rem; font-weight: bold; text-shadow: 0 0 15px rgba(212,175,55,0.4); }
         
-        @media (min-width: 768px) {
-            .dashboard-grid {
-                flex-direction: row;
-            }
-        }
+        /* نظام اللغات */
+        .lang-bar { display: flex; justify-content: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .lang-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); cursor: pointer; padding: 5px 10px; font-size: 12px; transition: 0.3s; }
+        .lang-btn:hover { background: var(--gold); color: #000; }
 
-        /* RADAR & INFO PANELS */
-        .panel {
-            background: var(--glass);
-            border: 1px solid var(--gold);
-            padding: 15px;
-            border-radius: 4px;
-            flex: 1;
-        }
+        .dashboard { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
+        @media (min-width: 768px) { .dashboard { grid-template-columns: 2fr 1fr; } }
+
+        .panel { background: rgba(10,10,10,0.9); border: 1px solid var(--gold); padding: 15px; position: relative; }
+        .radar-log { height: 250px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; border-top: 1px solid #222; margin-top: 10px; }
         
-        .radar-log {
-            height: 200px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            border-top: 1px solid #333;
-            padding-top: 10px;
-        }
-        .log-entry { margin-bottom: 5px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .time-stamp { color: var(--gold); margin-right: 5px; }
+        .hex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-top: 20px; }
+        .p-btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 12px 0; cursor: pointer; transition: 0.4s; font-weight: bold; }
+        .p-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
 
-        /* PROTOCOL GRID */
-        .hex-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 8px;
-            margin-top: 20px;
-        }
-        .hex-btn {
-            background: transparent;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 10px 0;
-            font-size: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .hex-btn:hover {
-            background: var(--gold);
-            color: #000;
-        }
-
-        /* POPUP SYSTEM */
-        #sov-popup {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            align-items: center; justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            padding: 20px;
-        }
-        .popup-box {
-            border: 4px solid var(--gold);
-            padding: 30px;
-            background: #000;
-            max-width: 90%;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
-        }
+        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; }
+        .popup-box { border: 3px solid var(--gold); padding: 40px; text-align: center; max-width: 90%; background: #000; }
     </style>
 </head>
 <body>
 
-    <div class="imperial-header">
-        <h1 class="main-title">Imperial General</h1>
-        <div class="valuation">$50,000,000.00</div>
-        <div class="status-line">SOVEREIGNTY ACTIVE / سيادة كاملة</div>
+<div class="header">
+    <h1 id="title" style="margin:0; letter-spacing:5px;">IMPERIAL GENERAL</h1>
+    <div class="valuation">$50,000,000.00</div>
+    <div id="status" style="color: var(--green); font-size: 12px; margin-top: 5px;">SYSTEM ONLINE / السيادة نشطة</div>
+    
+    <div class="lang-bar">
+        <button class="lang-btn" onclick="setLang('ar')">العربية</button>
+        <button class="lang-btn" onclick="setLang('en')">English</button>
+        <button class="lang-btn" onclick="setLang('ru')">Русский</button>
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('ja')">日本語</button>
     </div>
+</div>
 
-    <div class="dashboard-grid">
-        <div class="panel">
-            <h3 style="color:var(--gold); margin-top:0;">STRATEGIC RADAR</h3>
-            <div id="radar-feed" class="radar-log">
-                <div class="log-entry">SYSTEM INITIALIZED...</div>
-            </div>
-        </div>
-
-        <div class="panel" style="flex: 0.6;">
-            <h3 style="color:var(--gold); margin-top:0;">SPECS</h3>
-            <div style="font-size: 0.8rem; color: #ccc; line-height: 1.6;">
-                > CORE: <span style="color:#00ff41">ONLINE</span><br>
-                > KEY: PROTECTED<br>
-                > WHALE_MODE: READY
-            </div>
-        </div>
+<div class="dashboard">
+    <div class="panel">
+        <h3 id="label-radar">STRATEGIC RADAR</h3>
+        <div id="radar" class="radar-log"></div>
     </div>
-
-    <div class="panel" style="margin-top: 15px;">
-        <h3 style="color:var(--gold); margin-top:0;">TACTICAL MODULES (P1-P70)</h3>
-        <div class="hex-grid" id="modules-container"></div>
-    </div>
-
-    <div id="sov-popup">
-        <div class="popup-box">
-            <h2 style="color: var(--gold); font-size: 2rem; margin-bottom: 10px;">ACQUISITION ALERT</h2>
-            <p id="popup-text" style="color: #fff; font-size: 1.2rem; margin-bottom: 20px;"></p>
-            <button onclick="document.getElementById('sov-popup').style.display='none'" 
-                    style="background:var(--gold); border:none; padding:15px 40px; font-weight:bold; cursor:pointer;">
-                ACKNOWLEDGE
-            </button>
+    <div class="panel">
+        <h3 id="label-specs">SYSTEM INTEGRITY</h3>
+        <div id="specs" style="font-size: 12px; color: #888;">
+            > CORE: <span style="color:var(--green)">ACTIVE</span><br>
+            > AUTH: VERIFIED<br>
+            > NODES: 70 STABLE
         </div>
     </div>
+</div>
 
-    <script>
-        const API_KEY = 'GENERAL_EYE_ONLY_VALIDATION_STRING';
+<div class="panel" style="margin-top:20px;">
+    <h3 id="label-modules">TACTICAL MODULES (P1-P70)</h3>
+    <div class="hex-grid" id="grid"></div>
+</div>
 
-        // Initialize Buttons
-        const grid = document.getElementById('modules-container');
-        for(let i=1; i<=70; i++) {
-            let btn = document.createElement('button');
-            btn.className = 'hex-btn';
-            btn.innerText = 'P' + i;
-            btn.onclick = () => execute(i);
-            grid.appendChild(btn);
+<div id="popup">
+    <div class="popup-box">
+        <h2 id="pop-title" style="color:var(--gold);">ACQUISITION ALERT</h2>
+        <p id="pop-msg" style="font-size: 1.2rem;"></p>
+        <button onclick="document.getElementById('popup').style.display='none'" style="background:var(--gold); border:none; padding:15px 40px; font-weight:bold; cursor:pointer;">CONFIRM</button>
+    </div>
+</div>
+
+<script>
+    const KEY = 'GENERAL_EYE_ONLY_VALIDATION_STRING';
+    const TRANSLATIONS = {
+        ar: { title: "الجنرال الإمبراطوري", radar: "رادار الرصد الاستراتيجي", specs: "سلامة النظام", modules: "الوحدات التكتيكية (P1-P70)", pop: "تنبيه الاستحواذ", status: "السيادة نشطة" },
+        en: { title: "IMPERIAL GENERAL", radar: "STRATEGIC RADAR", specs: "SYSTEM INTEGRITY", modules: "TACTICAL MODULES (P1-P70)", pop: "ACQUISITION ALERT", status: "SOVEREIGNTY ACTIVE" },
+        ru: { title: "ИМПЕРСКИЙ ГЕНЕРАЛ", radar: "СТРАТЕГИЧЕСКИЙ РАДАР", specs: "ЦЕЛОСТНОСТЬ СИСТЕМЫ", modules: "ТАКТИЧЕСКИЕ МОДУЛИ", pop: "СИГНАЛ ПОГЛОЩЕНИЯ", status: "СУВЕРЕНИТЕТ АКТИВЕН" },
+        zh: { title: "帝国将军", radar: "战略雷达", specs: "系统完整性", modules: "战术模块", pop: "收购警报", status: "主权激活" },
+        ja: { title: "帝国将軍", radar: "戦略レーダー", specs: "システム整合性", modules: "戦術モジュール", pop: "買収アラート", status: "主権発動" }
+    };
+
+    function setLang(l) {
+        const t = TRANSLATIONS[l];
+        document.getElementById('title').innerText = t.title;
+        document.getElementById('label-radar').innerText = t.radar;
+        document.getElementById('label-specs').innerText = t.specs;
+        document.getElementById('label-modules').innerText = t.modules;
+        document.getElementById('pop-title').innerText = t.pop;
+        document.getElementById('status').innerText = t.status;
+    }
+
+    const grid = document.getElementById('grid');
+    for(let i=1; i<=70; i++) {
+        let b = document.createElement('button');
+        b.className = 'p-btn'; b.innerText = 'P' + i;
+        b.onclick = () => execute(i);
+        grid.appendChild(b);
+    }
+
+    async function execute(id) {
+        const res = await fetch(`/api/general?code=P${id}&key=${KEY}`);
+        const data = await res.json();
+        const entry = document.createElement('div');
+        entry.style.padding = "5px 0";
+        entry.innerHTML = `<span style="color:var(--gold)">[${new Date().toLocaleTimeString()}]</span> > ${data.msg}`;
+        document.getElementById('radar').prepend(entry);
+        if(id === 70) {
+            document.getElementById('pop-msg').innerText = data.msg;
+            document.getElementById('popup').style.display = 'flex';
         }
-
-        async function execute(id) {
-            const feed = document.getElementById('radar-feed');
-            
-            // Optimistic UI Update (Instant Feedback)
-            const loading = document.createElement('div');
-            loading.className = 'log-entry';
-            loading.innerHTML = `<span class="time-stamp">>></span> Executing P${id}...`;
-            feed.prepend(loading);
-
-            try {
-                const res = await fetch(`/api/general?code=P${id}&key=${API_KEY}`);
-                const data = await res.json();
-                
-                loading.innerHTML = `<span class="time-stamp">[${new Date().toLocaleTimeString()}]</span> ${data.msg}`;
-                
-                if(data.type === 'ALERT') {
-                    document.getElementById('popup-text').innerText = data.msg;
-                    document.getElementById('sov-popup').style.display = 'flex';
-                }
-            } catch (err) {
-                loading.innerText = "CONNECTION LOST.";
-                loading.style.color = "red";
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
 """
 
 # ==========================================
-# BACKEND LOGIC (FLASK)
+# BACKEND LOGIC (STRATEGIC ENGINE)
 # ==========================================
 @app.route('/')
 def home():
@@ -238,30 +150,24 @@ def api_logic():
     code = request.args.get('code', 'P1')
     key = request.args.get('key', '')
     
-    # Security Check
     if key != MASTER_KEY:
-        return jsonify({"type": "ERROR", "msg": "UNAUTHORIZED ACCESS DETECTED."})
+        return jsonify({"msg": "UNAUTHORIZED ACCESS."})
 
-    # Business Logic
-    if code == 'P70':
-        return jsonify({
-            "type": "ALERT", 
-            "msg": "SOVEREIGNTY ESTABLISHED. $50M ACQUISITION PROTOCOL READY."
-        })
+    num = int(code[1:])
     
-    elif code == 'P1':
-        val = random.randint(10, 90)
-        return jsonify({
-            "type": "INFO", 
-            "msg": f"Whale Flow Detected: ${val}M Capital Injection."
-        })
-        
-    else:
-        return jsonify({
-            "type": "INFO", 
-            "msg": f"Module {code} operational. Analyzing market data..."
-        })
+    # تفصيل منطق الوحدات (P2 - P69) [cite: 2026-02-01]
+    if num == 70:
+        return jsonify({"msg": "GOLDEN PROTOCOL: $50,000,000 ACQUISITION CONFIRMED / تم تأكيد الاستحواذ"})
+    elif 1 <= num <= 10:
+        return jsonify({"msg": f"Unit {code}: Predictive Analysis - Market Shift {random.randint(1,5)}% detected."})
+    elif 11 <= num <= 30:
+        return jsonify({"msg": f"Unit {code}: Cyber Defense Grid - Shielding Level {random.randint(90,99)}%."})
+    elif 31 <= num <= 50:
+        return jsonify({"msg": f"Unit {code}: Whale Logic Engagement - Profiling Enterprise Acquirer..."})
+    elif 51 <= num <= 69:
+        return jsonify({"msg": f"Unit {code}: Cross-Platform Synchronization - Logic Automation ACTIVE."})
+    
+    return jsonify({"msg": f"Module {code} operational."})
 
-# Vercel requires the app to be exposed
 if __name__ == '__main__':
     app.run()
