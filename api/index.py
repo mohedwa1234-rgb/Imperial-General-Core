@@ -169,7 +169,6 @@ def api_logic():
     
     return jsonify({"msg": f"Module {code} operational."})
 
-# احذف if __name__ == '__main__': 
  Vercel:
 app = app
 
