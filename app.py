@@ -288,19 +288,65 @@ def home():
 
     html = """
     <!doctype html>
-    <html lang="ar" dir="rtl">
-    <head><title>Ghost General v3.5</title></head>
-    <body style="background-color: #121212; color: #fff; font-family: Arial;">
-        <h1 style="text-align: center;">Ghost General v{{ version }} - Sovereign Simulator</h1>
-        <p>Hardcoded Valuation: ${{ price }}</p>
-        <form method="post">
-            <label>أدخل الأمر (مثل: zero_day_logic_analysis):</label><br>
-            <input type="text" name="command" placeholder="e.g., whale_tier_communication">
-            <button type="submit">Execute</button>
-        </form>
-        <h2>النتيجة:</h2><pre>{{ result }}</pre>
-        {{ logs_html | safe }}
-        <p>قائمة أوامر ممكنة: zero_day_logic_analysis, predictive_threat_forecasting, whale_tier_communication, etc.</p>
+html = """
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost General v3.5 - Sovereign Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { imperial: '#1e293b' } } }
+        }
+    </script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-blue-400 mb-2">Ghost General v{{ version }}</h1>
+            <p class="text-xl text-gray-400">Sovereign Asset Simulator</p>
+            <div class="mt-4 inline-block bg-gray-800 px-6 py-3 rounded-full shadow-lg">
+                <span class="font-mono text-green-400">Valuation: ${{ price | format_number }}</span>
+            </div>
+        </header>
+
+        <main class="space-y-8">
+            <section class="bg-gray-900 p-6 rounded-xl shadow-xl border border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-300">Execute Command</h2>
+                <form method="post" class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" name="command" placeholder="e.g. zero_day_logic_analysis" 
+                           class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-medium transition">
+                        Execute
+                    </button>
+                </form>
+            </section>
+
+            {% if result %}
+            <section class="bg-gray-900 p-6 rounded-xl shadow-xl border border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4 text-green-400">النتيجة</h2>
+                <pre class="bg-black p-4 rounded-lg overflow-auto text-sm text-gray-300 whitespace-pre-wrap">{{ result }}</pre>
+            </section>
+            {% endif %}
+
+            <section class="bg-gray-900 p-6 rounded-xl shadow-xl border border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4 text-purple-400">آخر 10 سجلات</h2>
+                <pre class="bg-black p-4 rounded-lg overflow-auto text-sm text-gray-300 max-h-96">{{ logs_html }}</pre>
+            </section>
+
+            <section class="text-center text-gray-500 text-sm">
+                <p>أوامر ممكنة: zero_day_logic_analysis, whale_tier_communication, forensic_hashing, self_optimize, ...</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+"""
+    < etc.</p>
     </body>
     </html>
     """.replace("{{ version }}", system.version).replace("{{ price }}", str(system.price)).replace("{{ result }}", result)
