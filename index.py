@@ -4,47 +4,27 @@ import secrets
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
-class ImperialGeneralEcosystem:
+class ImperialEngine:
     def __init__(self):
-        # مفتاح السيادة المطلقة
         self.master_key = 'GENERAL_EYE_ONLY_VALIDATION_STRING' [cite: 2026-02-04]
 
-    def execute_protocol(self, p_code, provided_key):
-        # التحقق من الصلاحيات (Zero-day Logic Analysis)
-        is_authorized = (provided_key == self.master_key) [cite: 2026-01-29]
-        
-        # بروتوكولات الحيتان (Whales' conversation)
+    def execute(self, p_code, key):
+        auth = (key == self.master_key)
         handlers = {
-            'P1': lambda: {
-                "title": "Whale Tracker / رصد الحيتان", 
-                "data": f"Capital Flow: ${random.randint(10,100)}M Detected via Stealth Node.", 
-                "status": "STRATEGIC_INTEL"
-            },
-            'P70': lambda: {
-                "title": "Imperial Sovereignty / السيادة الإمبراطورية", 
-                "data": "System Online. Defense Grid at 100%. Master Key Verified.", 
-                "status": "GENERAL_EYE_ONLY"
-            } if is_authorized else {"title": "BREACH ALERT", "data": "Unauthorized Access Blocked.", "status": "TERMINATED"}
+            'P1': lambda: {"title": "Whale Tracker", "data": f"Asset Flow Detected: ${random.randint(10,100)}M", "status": "LIVE"},
+            'P70': lambda: {"title": "Sovereign Command", "data": "Full Imperial Control Established. $50M Deal Ready.", "status": "GOD_MODE"} if auth else {"title": "DENIED", "data": "Breach Attempt Logged."}
         }
-
-        action = handlers.get(p_code, lambda: {
-            "title": f"Module {p_code}", 
-            "data": "Processing technical M&A data for Enterprise Acquirer...", 
-            "status": "ACTIVE"
-        })
-        return action()
+        res = handlers.get(p_code, lambda: {"title": f"Protocol {p_code}", "data": "Executing stealth background operation.", "status": "ACTIVE"})
+        return res()
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         params = parse_qs(urlparse(self.path).query)
-        p_code = params.get('p_code', ['P1'])[0]
-        provided_key = params.get('key', [None])[0]
-
+        p = params.get('p_code', ['P1'])[0]
+        k = params.get('key', [None])[0]
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
-
-        gen = ImperialGeneralEcosystem()
-        response = gen.execute_protocol(p_code, provided_key)
+        response = ImperialEngine().execute(p, k)
         self.wfile.write(json.dumps(response, ensure_ascii=False).encode())
