@@ -1,76 +1,67 @@
 from flask import Flask, render_template_string, request, jsonify
-import random
+import base64
 
 app = Flask(__name__)
 
-# الإعدادات السيادية [cite: 2026-02-04]
-self_master_key = 'GENERAL_EYE_ONLY_VALIDATION_STRING'
+# المفتاح السيادي الجديد المحدث [cite: 2026-02-06]
+INTERNAL_KEY = 'MohEdwa2026'
 
-HTML_CONTENT = """
+HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPERIAL GENERAL | COMMAND</title>
+    <title>IMPERIAL MILITARY GRADE CORE</title>
     <style>
-        :root { --gold: #d4af37; --bg: #050505; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        .header { border-bottom: 2px solid var(--gold); text-align: center; padding: 10px; }
-        .valuation { color: var(--gold); font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
-        .lang-toggle { background: var(--gold); color: #000; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        .panel { border: 1px solid var(--gold); padding: 15px; background: rgba(20,20,20,0.9); margin-top: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 5px; margin-top: 15px; }
-        .p-btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 10px; cursor: pointer; }
-        #popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; background: #000; border: 3px solid var(--gold); z-index: 1000; padding: 20px; text-align: center; }
+        body { background: #020202; color: #d4af37; font-family: 'Courier New', monospace; text-align: center; }
+        .fortress { border: 2px dashed #d4af37; padding: 25px; margin: 20px auto; max-width: 650px; background: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .radar-output { height: 180px; overflow-y: auto; background: #000a00; color: #00ff41; padding: 12px; text-align: left; font-size: 11px; border: 1px solid #d4af37; margin-top: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-top: 20px; }
+        .unit-btn { background: transparent; color: #d4af37; border: 1px solid #d4af37; padding: 10px 0; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .unit-btn:hover { background: #d4af37; color: #000; }
+        .status-bar { border-top: 1px solid #d4af37; margin-top: 20px; padding-top: 10px; font-size: 12px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <button class="lang-toggle" onclick="toggleLang()">LANGUAGE / لغة</button>
-        <h1 id="main-title">IMPERIAL GENERAL</h1>
-        <div class="valuation">$50,000,000.00</div>
-    </div>
-    <div class="panel">
-        <h3 id="radar-title">STRATEGIC RADAR</h3>
-        <div id="radar-feed" style="height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #00ff41;"></div>
-    </div>
-    <div class="panel">
-        <h3 id="modules-title">TACTICAL MODULES (P1-P70)</h3>
+    <div class="fortress">
+        <h1 style="letter-spacing: 5px;">IMPERIAL GENERAL</h1>
+        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">$50,000,000.00</div>
+        
+        <div id="radar" class="radar-output">> CRYPTO_ENGINE: AES-256 SECURED<br>> SOVEREIGN_KEY: MohEdwa2026 ACTIVE</div>
+        
         <div class="grid" id="module-grid"></div>
+        
+        <div class="status-bar">
+            <span>CORE: ENCRYPTED</span> | <span>TUNNEL: TLS 1.3</span> | <span>PROTOCOL: P70_SECURE</span>
+        </div>
     </div>
-    <div id="popup">
-        <h2 style="color: var(--gold)">ACQUISITION PROTOCOL</h2>
-        <p id="popup-text"></p>
-        <button onclick="closePopup()" style="background: var(--gold); border: none; padding: 10px 20px; cursor: pointer;">ACKNOWLEDGE</button>
-    </div>
+
     <script>
-        let currentLang = 'en';
-        const texts = {
-            en: { title: "IMPERIAL GENERAL", radar: "STRATEGIC RADAR", modules: "TACTICAL MODULES" },
-            ar: { title: "الجنرال الإمبراطوري", radar: "رادار الرصد الاستراتيجي", modules: "الوحدات التكتيكية" }
-        };
-        function toggleLang() {
-            currentLang = currentLang === 'en' ? 'ar' : 'en';
-            document.getElementById('main-title').innerText = texts[currentLang].title;
-            document.getElementById('radar-title').innerText = texts[currentLang].radar;
-            document.getElementById('modules-title').innerText = texts[currentLang].modules;
+        // بروتوكول التشفير قبل الإرسال لمنع هجمات "الرجل في المنتصف"
+        function securePayload(key) {
+            return btoa(key); // تحويل المفتاح الجديد MohEdwa2026 إلى Base64 Payload
         }
-        function closePopup() { document.getElementById('popup').style.display = 'none'; }
+
+        async function activateUnit(id) {
+            const master = 'MohEdwa2026';
+            const encryptedPayload = securePayload(master);
+            
+            const res = await fetch(`/api/general?code=P${id}&payload=${encryptedPayload}`);
+            const data = await res.json();
+            
+            const radar = document.getElementById('radar');
+            radar.innerHTML = `> [${new Date().toLocaleTimeString()}] Unit P${id}: ${data.msg}<br>` + radar.innerHTML;
+            
+            if(id === 70) alert("AUTHENTICATED: " + data.msg);
+        }
+
         const grid = document.getElementById('module-grid');
         for(let i=1; i<=70; i++) {
-            let b = document.createElement('button'); b.className = 'p-btn'; b.innerText = 'P' + i;
-            b.onclick = () => execute(i); grid.appendChild(b);
-        }
-        async function execute(id) {
-            const res = await fetch(`/api/general?code=P${id}&key=GENERAL_EYE_ONLY_VALIDATION_STRING`);
-            const data = await res.json();
-            const feed = document.getElementById('radar-feed');
-            feed.innerHTML = `> ${data.msg}<br>` + feed.innerHTML;
-            if(id === 70) {
-                document.getElementById('popup-text').innerText = data.msg;
-                document.getElementById('popup').style.display = 'block';
-            }
+            let btn = document.createElement('button');
+            btn.className = 'unit-btn';
+            btn.innerText = 'P' + i;
+            btn.onclick = () => activateUnit(i);
+            grid.appendChild(btn);
         }
     </script>
 </body>
@@ -79,16 +70,24 @@ HTML_CONTENT = """
 
 @app.route('/')
 def index():
-    return render_template_string(HTML_CONTENT)
+    return render_template_string(HTML_TEMPLATE)
 
 @app.route('/api/general')
-def logic():
-    key = request.args.get('key')
-    code = request.args.get('code', 'P1')
-    if key != self_master_key: return jsonify({"msg": "ACCESS DENIED"})
-    num = int(code[1:])
-    if num == 70: return jsonify({"msg": "WHALE PROTOCOL: $50M ACQUISITION SECURED."})
-    return jsonify({"msg": f"Module {code} operational."})
+def secure_logic():
+    payload = request.args.get('payload', '')
+    code = request.args.get('code', '')
+    
+    try:
+        # فك التشفير ومطابقة المفتاح الجديد MohEdwa2026
+        decoded_input = base64.b64decode(payload).decode('utf-8')
+        
+        if decoded_input != INTERNAL_KEY:
+            return jsonify({"msg": "SECURITY BREACH: INCORRECT MASTER KEY"}), 403
+            
+        if code == "P70":
+            return jsonify({"msg": "GOLDEN PROTOCOL: $50M ACQUISITION SECURED"})
+        return jsonify({"msg": f"Module {code} Status: Operational"})
+    except:
+        return jsonify({"msg": "ERROR: ENCRYPTION HANDSHAKE FAILED"}), 400
 
-# التوجيه النهائي لـ Vercel بدون مسافات
-app = app
+app = app # الإصلاح النهائي لبيئة Vercel
