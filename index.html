@@ -1,69 +1,68 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" id="html-tag">
 <head>
     <meta charset="UTF-8">
     <title>Imperial Cyber-General Dashboard</title>
     <style>
-        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
-        .radar-box { border: 1px solid #00ff41; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px #00ff41; min-height: 100px; }
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; overflow-x: hidden; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ff41; padding-bottom: 10px; }
+        .radar-box { border: 1px solid #00ff41; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px #00ff41; min-height: 120px; }
         .button-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
-        button { background: #001100; color: #00ff41; border: 1px solid #00ff41; cursor: pointer; padding: 8px; font-size: 10px; }
-        button:hover { background: #00ff41; color: #000; }
-        .log-entry { font-size: 0.9em; margin: 5px 0; border-bottom: 1px solid #004400; }
+        button { background: #001100; color: #00ff41; border: 1px solid #00ff41; cursor: pointer; padding: 8px; font-size: 10px; transition: 0.3s; }
+        button:hover { background: #00ff41; color: #000; box-shadow: 0 0 15px #00ff41; }
+        #general-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; }
+        .popup-content { background: #000; border: 2px solid #00ff41; padding: 30px; text-align: center; box-shadow: 0 0 20px #00ff41; }
     </style>
 </head>
 <body>
-    <h1>GENERAL COMMAND CENTER v11.0</h1>
-    <div id="status-display" style="color: yellow;">Status: STANDBY / جاهز</div>
-    
+    <div class="header-container">
+        <h1 id="main-title">GENERAL COMMAND CENTER v11.0</h1>
+        <button onclick="toggleLanguage()" id="lang-btn" style="font-size: 14px; padding: 5px 15px;">English Mode</button>
+    </div>
+
+    <div id="status-display" style="color: yellow; margin: 10px 0;">Status: STANDBY / جاهز</div>
     <div class="radar-box">
-        <h3 style="margin-top:0;">LIVE RADAR FEED / رادارات الرصد</h3>
+        <h3 id="radar-title">LIVE RADAR FEED / رادارات الرصد</h3>
         <div id="radar-logs"></div>
     </div>
 
-    <h3>TACTICAL MODULES (P1 - P70)</h3>
     <div class="button-grid" id="btn-grid"></div>
 
+    <div id="general-popup">
+        <div class="popup-content">
+            <h2 id="pop-title" style="color:red">ACQUISITION ALERT</h2>
+            <p id="pop-msg">Whale Engagement Detected.</p>
+            <button onclick="closePopup()">ACKNOWLEDGE</button>
+        </div>
+    </div>
+
     <script>
-        let isProcessing = false;
-        const GRID = document.getElementById('btn-grid');
-        const LOGS = document.getElementById('radar-logs');
+        const master_key = 'GENERAL_EYE_ONLY_VALIDATION_STRING'; [cite: 2026-02-04]
+        let currentLang = 'ar';
 
         for(let i=1; i<=70; i++) {
             let btn = document.createElement('button');
             btn.innerText = 'P' + i;
             btn.onclick = () => executeProtocol('P' + i);
-            GRID.appendChild(btn);
+            document.getElementById('btn-grid').appendChild(btn);
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'English Mode' : 'الوضع العربي';
+            document.getElementById('main-title').innerText = currentLang === 'ar' ? "GENERAL COMMAND CENTER v11.0" : "مركز قيادة الجنرال";
         }
 
         async function executeProtocol(pCode) {
-            if (isProcessing) return;
-            isProcessing = true;
-            document.getElementById('status-display').innerText = `EXECUTING ${pCode}...`;
-            
-            try {
-                // الربط المباشر مع المسار المعتمد في vercel.json
-                const response = await fetch('/api/general?p_code=' + pCode);
-                const data = await response.json();
-                
-                const entry = document.createElement('div');
-                entry.className = 'log-entry';
-                entry.innerHTML = `[${new Date().toLocaleTimeString()}] > ${data.title}: ${data.data}`;
-                LOGS.prepend(entry);
-                
-                if (LOGS.childNodes.length > 8) LOGS.removeChild(LOGS.lastChild);
-            } catch (err) {
-                console.error("Connection Error");
-            } finally {
-                setTimeout(() => { 
-                    isProcessing = false; 
-                    document.getElementById('status-display').innerText = "Status: ONLINE / سيادة كاملة";
-                }, 3000);
-            }
+            const res = await fetch(`/api/general?p_code=${pCode}&key=${master_key}`);
+            const data = await res.json();
+            const entry = document.createElement('div');
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] > ${data.title}: ${data.data}`;
+            document.getElementById('radar-logs').prepend(entry);
+            if(pCode === 'P70') document.getElementById('general-popup').style.display = 'flex';
         }
 
-        // رادار تلقائي آمن
-        setInterval(() => { if(!isProcessing) executeProtocol('P1'); }, 15000);
+        function closePopup() { document.getElementById('general-popup').style.display = 'none'; }
     </script>
 </body>
 </html>
