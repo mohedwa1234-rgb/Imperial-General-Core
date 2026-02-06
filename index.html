@@ -2,67 +2,234 @@
 <html lang="ar" id="html-tag">
 <head>
     <meta charset="UTF-8">
-    <title>Imperial Cyber-General Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPERIAL CYBER-GENERAL | STRATEGIC COMMAND</title>
     <style>
-        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; overflow-x: hidden; }
-        .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ff41; padding-bottom: 10px; }
-        .radar-box { border: 1px solid #00ff41; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px #00ff41; min-height: 120px; }
-        .button-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
-        button { background: #001100; color: #00ff41; border: 1px solid #00ff41; cursor: pointer; padding: 8px; font-size: 10px; transition: 0.3s; }
-        button:hover { background: #00ff41; color: #000; box-shadow: 0 0 15px #00ff41; }
-        #general-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; }
-        .popup-content { background: #000; border: 2px solid #00ff41; padding: 30px; text-align: center; box-shadow: 0 0 20px #00ff41; }
+        :root {
+            --gold: #d4af37;
+            --cyber-green: #00ff41;
+            --deep-black: #050505;
+            --glow: rgba(0, 255, 65, 0.2);
+        }
+
+        body {
+            background-color: var(--deep-black);
+            color: white;
+            font-family: 'Segoe UI', Roboto, 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+
+        /* الإطار الإمبراطوري */
+        .imperial-border {
+            border: 1px solid var(--gold);
+            padding: 2px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .main-container {
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 30px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .valuation-badge {
+            font-size: 24px;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            font-weight: bold;
+            border: 1px solid var(--gold);
+            padding: 10px 20px;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        /* الرادار الإستراتيجي */
+        .radar-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .radar-box {
+            background: rgba(0, 255, 65, 0.02);
+            border-left: 4px solid var(--cyber-green);
+            padding: 20px;
+            height: 250px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 0 0 20px var(--glow);
+        }
+
+        /* الأزرار التكتيكية (Hexagon Style) */
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .protocol-btn {
+            background: transparent;
+            color: var(--cyber-green);
+            border: 1px solid var(--cyber-green);
+            padding: 15px 5px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .protocol-btn:hover {
+            background: var(--cyber-green);
+            color: black;
+            box-shadow: 0 0 20px var(--cyber-green);
+            transform: scale(1.1);
+        }
+
+        /* بوب-أب الاستحواذ */
+        #general-popup {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            justify-content: center; align-items: center;
+        }
+
+        .popup-content {
+            border: 2px solid var(--gold);
+            padding: 50px;
+            background: #0a0a0a;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+        }
+
+        .lang-toggle {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 8px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .status-text { color: var(--cyber-green); letter-spacing: 2px; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); }
     </style>
 </head>
 <body>
-    <div class="header-container">
-        <h1 id="main-title">GENERAL COMMAND CENTER v11.0</h1>
-        <button onclick="toggleLanguage()" id="lang-btn" style="font-size: 14px; padding: 5px 15px;">English Mode</button>
-    </div>
 
-    <div id="status-display" style="color: yellow; margin: 10px 0;">Status: STANDBY / جاهز</div>
-    <div class="radar-box">
-        <h3 id="radar-title">LIVE RADAR FEED / رادارات الرصد</h3>
-        <div id="radar-logs"></div>
-    </div>
+<div class="imperial-border">
+    <div class="main-container">
+        <header>
+            <div>
+                <h1 id="main-title" style="margin:0; color: white; letter-spacing: 5px;">GENERAL COMMAND v11.0</h1>
+                <div class="status-text" id="status-display">SOVEREIGNTY ESTABLISHED / سيادة كاملة</div>
+            </div>
+            <div class="valuation-badge">$50,000,000.00</div>
+            <button class="lang-toggle" onclick="toggleLanguage()" id="lang-btn">ENGLISH MODE</button>
+        </header>
 
-    <div class="button-grid" id="btn-grid"></div>
-
-    <div id="general-popup">
-        <div class="popup-content">
-            <h2 id="pop-title" style="color:red">ACQUISITION ALERT</h2>
-            <p id="pop-msg">Whale Engagement Detected.</p>
-            <button onclick="closePopup()">ACKNOWLEDGE</button>
+        <div class="radar-section">
+            <div class="radar-box">
+                <h3 id="radar-title" style="color: var(--gold); margin-top: 0;">STRATEGIC RADAR FEED</h3>
+                <div id="radar-logs"></div>
+            </div>
+            <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; background: rgba(255,255,255,0.02);">
+                <h4 style="color: var(--gold);">SYSTEM SPECS</h4>
+                <p style="font-size: 12px; color: #888;">
+                    - Master Key: ACTIVE [cite: 2026-02-04]<br>
+                    - Whale Protocol: ENABLED [cite: 2026-02-01]<br>
+                    - Security Grid: LEVEL 10 [cite: 2026-02-03]
+                </p>
+            </div>
         </div>
+
+        <h3 id="modules-title" style="border-left: 3px solid var(--gold); padding-left: 10px;">TACTICAL MODULES (P1 - P70)</h3>
+        <div class="protocol-grid" id="btn-grid"></div>
     </div>
+</div>
 
-    <script>
-        const master_key = 'GENERAL_EYE_ONLY_VALIDATION_STRING'; [cite: 2026-02-04]
-        let currentLang = 'ar';
+<div id="general-popup">
+    <div class="popup-content">
+        <h1 style="color: var(--gold); font-size: 40px; margin-bottom: 10px;">GOLDEN ACQUISITION</h1>
+        <p id="pop-msg" style="font-size: 18px; color: #ccc;"></p>
+        <button onclick="closePopup()" style="background: var(--gold); padding: 15px 40px; border: none; font-weight: bold; cursor: pointer;">CONFIRM SOVEREIGNTY</button>
+    </div>
+</div>
 
-        for(let i=1; i<=70; i++) {
-            let btn = document.createElement('button');
-            btn.innerText = 'P' + i;
-            btn.onclick = () => executeProtocol('P' + i);
-            document.getElementById('btn-grid').appendChild(btn);
-        }
+<script>
+    const master_key = 'GENERAL_EYE_ONLY_VALIDATION_STRING'; [cite: 2026-02-04]
+    let currentLang = 'ar';
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'English Mode' : 'الوضع العربي';
-            document.getElementById('main-title').innerText = currentLang === 'ar' ? "GENERAL COMMAND CENTER v11.0" : "مركز قيادة الجنرال";
-        }
+    // توليد الأزرار بشكل هندسي
+    const grid = document.getElementById('btn-grid');
+    for(let i=1; i<=70; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'protocol-btn';
+        btn.innerText = 'P' + i;
+        btn.onclick = () => executeProtocol('P' + i);
+        grid.appendChild(btn);
+    }
 
-        async function executeProtocol(pCode) {
-            const res = await fetch(`/api/general?p_code=${pCode}&key=${master_key}`);
+    function toggleLanguage() {
+        currentLang = currentLang === 'ar' ? 'en' : 'ar';
+        const titles = {
+            'ar': ["مركز قيادة الجنرال v11.0", "رادارات الرصد الإستراتيجي", "الوحدات التكتيكية", "ENGLISH MODE"],
+            'en': ["GENERAL COMMAND CENTER v11.0", "STRATEGIC RADAR FEED", "TACTICAL MODULES", "الوضع العربي"]
+        };
+        const langSet = titles[currentLang];
+        document.getElementById('main-title').innerText = langSet[0];
+        document.getElementById('radar-title').innerText = langSet[1];
+        document.getElementById('modules-title').innerText = langSet[2];
+        document.getElementById('lang-btn').innerText = langSet[3];
+    }
+
+    async function executeProtocol(pCode) {
+        document.getElementById('status-display').innerText = `PROCESSING ${pCode}...`;
+        try {
+            const res = await fetch(`/api/general?p_code=${pCode}&key=${master_key}`); [cite: 2026-02-04]
             const data = await res.json();
-            const entry = document.createElement('div');
-            entry.innerHTML = `[${new Date().toLocaleTimeString()}] > ${data.title}: ${data.data}`;
-            document.getElementById('radar-logs').prepend(entry);
-            if(pCode === 'P70') document.getElementById('general-popup').style.display = 'flex';
-        }
+            
+            const log = document.createElement('div');
+            log.style.padding = "5px 0";
+            log.style.borderBottom = "1px solid rgba(0,255,65,0.1)";
+            log.innerHTML = `<span style="color: var(--gold)">[${new Date().toLocaleTimeString()}]</span> > ${data.title}: ${data.data}`;
+            
+            const logsBox = document.getElementById('radar-logs');
+            logsBox.prepend(log);
 
-        function closePopup() { document.getElementById('general-popup').style.display = 'none'; }
-    </script>
+            if(pCode === 'P70') {
+                document.getElementById('pop-msg').innerText = data.data;
+                document.getElementById('general-popup').style.display = 'flex';
+            }
+        } catch(e) {
+            console.error("Link Terminated");
+        } finally {
+            setTimeout(() => {
+                document.getElementById('status-display').innerText = "SYSTEM ONLINE / سيادة كاملة";
+            }, 2000);
+        }
+    }
+
+    function closePopup() { document.getElementById('general-popup').style.display = 'none'; }
+</script>
+
 </body>
 </html>
